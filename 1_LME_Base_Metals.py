@@ -29,11 +29,20 @@ with tab1:
         st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and paste: GITHUB_TOKEN = 'your_token'")
     else:
         token = st.secrets["GITHUB_TOKEN"]
-        url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
         headers = {"Authorization": f"token {token}"}
+        
+        # Smart Branch-Fallthrough Core
+        url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
+        url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
 
         try:
-            response = requests.get(url, headers=headers)
+            # Try fetching from the main branch first
+            response = requests.get(url_main, headers=headers)
+            
+            # If main branch returns a 404, instantly try the master branch fallback
+            if response.status_code == 404:
+                response = requests.get(url_master, headers=headers)
+                
             if response.status_code == 200:
                 master_df = pd.read_csv(StringIO(response.text))
                 
@@ -64,6 +73,7 @@ with tab1:
                     st.warning("Data file found, but requested asset classes are empty.")
             else:
                 st.error(f"⚠️ Failed to pull data from GitHub. HTTP Status Code: {response.status_code}")
+                st.info("Verify that lme_master_data.csv exists at the root folder of your repository branch.")
         except Exception as e:
             st.error(f"❌ Data Stream Error: {e}")
 
