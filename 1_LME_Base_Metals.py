@@ -5,11 +5,15 @@ import requests
 import plotly.graph_objects as go
 import re
 from io import StringIO
+from datetime import datetime
 
 # --- CONFIGURATION MATCHING YOUR REPO ---
 GITHUB_USERNAME = "lewiskhaw"
 GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
+
+# Global date variable initialization to secure regex fallbacks
+today_str = datetime.today().strftime('%Y-%m-%d')
 
 # 1. Global Page Layout Setup
 st.set_page_config(page_title="LME Base Metals Intelligence", layout="wide", page_icon="🏭")
@@ -159,11 +163,10 @@ with tab2:
         for f in sorted(all_files, reverse=True):
             clean_name = f.replace(".md", "")
             
-            # Extract date safely using a 10-character boundary matching regular expression pattern
+            # Safe regular expression lookup for dates
             date_match = re.search(r'\d{4}-\d{2}-\d{2}', f)
             extracted_date = date_match.group(0) if date_match else today_str
             
-            # Resilient label distribution matrix
             if "Global_Macro_Shift" in f:
                 display_options[f] = f"🌐 Macro Shift Analysis: {extracted_date}"
             elif "Case_Study_Commodities" in f:
