@@ -1,23 +1,37 @@
 # LME Metals Intelligence Briefing — 2026-06-30
 
-# Executive Briefing on LME Non-Ferrous Metals Market Analysis
+# Executive Briefing on Today's LME Market Metrics
 
 ## Key Structural Shifts Identified
 
-- **Increased Volatility in Copper Pricing**: The copper market has seen a significant uptick in price fluctuations over the past month, with spot prices becoming more volatile. This increased volatility could indicate potential structural shifts in the supply and demand dynamics of the copper market.
+- **Aluminum:**
+  - *Significant backwardation*: The prompt spread for aluminum has widened substantially, indicating a strong demand for immediate delivery and a steep contango further out. This points to potential arbitrage opportunities in the spot vs. forward market.
+  - *Stock level volatility*: Aluminum stock levels across LME-registered warehouses have shown notable fluctuations, especially in major storage hubs. This could signal increased trading activity or changes in supply dynamics.
 
-## Severe Prompt Spread Moves (Contango/Backwardation)
+- **Copper:**
+  - *Muted contango*: While still displaying some contango, the copper prompt spread has not experienced the same degree of widening as aluminum. However, close monitoring is advised due to potential shifts in market sentiment.
+  - *Stock level stability*: Copper stock levels have remained relatively stable across LME-registered warehouses compared to other metals. This suggests a more balanced supply-demand situation in the short term.
 
-- **Aluminum: Backwardation in Short-Term Contracts**: The aluminum market has experienced a notable backwardation in short-term contracts, suggesting a shortage of immediate delivery compared to longer-term contracts. This could present arbitrage opportunities for those with access to both prompt and later delivery metal.
+## Severe Prompt Spread Movements
 
-- **Copper: Slight Contango in Spot vs 3 Months**: The copper market shows a slight contango between spot and three-month prices, indicating that the market expects some price decrease from immediate to future deliveries. However, this contango is relatively flat, suggesting limited arbitrage opportunities due to tight physical market conditions.
+- **Lead:**
+  - *Backwardation observed*: The lead prompt spread has shown signs of backwardation, indicating a premium for immediate delivery. This could be driven by specific industrial or battery sectors requiring urgent supplies.
+  - *Stock level dynamics*: Lead stock levels have experienced notable fluctuations, with significant withdrawals from some major storage hubs. This may suggest increased demand or strategic inventory adjustments.
 
-## Absolute Arbitrage or Physical Momentum Flags
+- **Zinc:**
+  - *Contango presence*: The zinc market continues to display a contango structure, with the prompt spread remaining relatively stable compared to other base metals. However, close monitoring is necessary due to potential shifts in supply chain dynamics.
+  - *Stock level patterns*: Zinc stock levels have shown some stability across LME-registered warehouses, but regional variations have emerged. This could indicate changes in trading flows or geographical demand patterns.
 
-- **Zinc: Spot vs 3 Months Backwardation**: Zinc spot prices are in backwardation compared to three-month contracts, indicating a shortage of immediate delivery metal. This situation could present arbitrage opportunities for those able to source and deliver prompt physical zinc.
+## Arbitrage and Physical Momentum Flags
 
-- **Lead: Spot Premium Over Futures Contract**: Lead spot prices are trading at a premium over the relevant futures contract, suggesting a strong demand for immediate delivery or a lack of available short-term supply. This premium could be an indicator of potential arbitrage if one can secure lead for prompt delivery against long positions in the futures market.
+- **Nickel:**
+  - *Arbitrage potential*: The nickel market has displayed signs of minor backwardation in the prompt spread, suggesting potential arbitrage opportunities between spot and near-term forward contracts.
+  - *Physical momentum*: There have been reports of increased physical trading activity in certain regions, possibly driven by industrial or battery sector requirements. This could translate into price momentum if sustained.
+
+- **Tin:**
+  - *Arbitrage caution*: The tin market has shown a stable contango structure, with the prompt spread remaining relatively flat. However, traders should remain cautious of potential supply chain disruptions or shifts in Chinese domestic demand, which could impact arbitrage opportunities.
+  - *Physical activity*: Tin stock levels have remained stable across LME-registered warehouses, but regional physical market dynamics may vary. Traders should monitor physical flows and storage patterns closely.
 
 ## Conclusion
 
-The current LME non-ferrous metals market shows signs of structural shifts, particularly evident in the copper and aluminum markets. The backwardation in short-term aluminum contracts and the slight contango in short-term copper contracts are noteworthy. Zinc and lead also show potential arbitrage opportunities due to their spot prices being at a premium or in backwardation compared to futures contracts. Market participants should closely monitor these trends for possible trading strategies, keeping in mind the tight physical market conditions that could limit the feasibility of some arbitrage positions.
+Today's LME market metrics highlight key structural shifts in aluminum and lead, with notable prompt spread movements indicating potential arbitrage opportunities or supply-demand imbalances. Copper and zinc markets show more stable contango structures, but close monitoring is advised due to underlying market dynamics. Nickel and tin markets offer some physical momentum flags and minor backwardation/arbitrage considerations, though traders should remain vigilant of regional and geopolitical factors impacting these markets. Overall, a strategic focus on aluminum and lead, along with careful arbitrage analysis in nickel, could yield profitable opportunities for astute LME trading desk strategists.
