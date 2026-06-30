@@ -24,58 +24,79 @@ tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case
 # TAB 1: QUANTITATIVE TRADING DESK METRICS (YOUR ORIGINAL LOGIC)
 # ==============================================================================
 with tab1:
-    if "GITHUB_TOKEN" not in st.secrets:
-        st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
-        st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and paste: GITHUB_TOKEN = 'your_token'")
-    else:
-        token = st.secrets["GITHUB_TOKEN"]
-        headers = {"Authorization": f"token {token}"}
+    master_df = None
+    
+    # --- PHASE 1: PREFER LOCAL WORKSPACE LOAD (Fastest & Safest) ---
+    # Since Streamlit clones your repo, check if the file is already sitting in the server root
+    local_csv_path = "lme_master_data.csv"
+    
+    # If the app is inside a subfolder/pages directory, check one level up as well
+    if not os.path.exists(local_csv_path):
+        local_csv_path = os.path.join("..", "lme_master_data.csv")
         
-        # Smart Branch-Fallthrough Core
-        url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
-        url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
-
+    if os.path.exists(local_csv_path):
         try:
-            # Try fetching from the main branch first
-            response = requests.get(url_main, headers=headers)
-            
-            # If main branch returns a 404, instantly try the master branch fallback
-            if response.status_code == 404:
-                response = requests.get(url_master, headers=headers)
-                
-            if response.status_code == 200:
-                master_df = pd.read_csv(StringIO(response.text))
-                
-                METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
-                metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
-                
-                df_metal = master_df[master_df['metal'] == metal_selection].copy()
-                df_metal['date'] = pd.to_datetime(df_metal['date'])
-                df_metal = df_metal.sort_values(by='date').reset_index(drop=True)
-                
-                if not df_metal.empty:
-                    current_price = df_metal['close'].iloc[-1]
-                    prior_price = df_metal['close'].iloc[-2]
-                    price_delta = current_price - prior_price
-                    pct_delta = (price_delta / prior_price) * 100
-                    
-                    col1, col2, col3 = st.columns(3)
-                    col1.metric(f"LME {metal_selection} Price", f"${current_price:,.2f}", f"{price_delta:+,.2f} ({pct_delta:+.2f}%)")
-                    col2.metric("Data Engine Status", "Cloud Synced (Active)")
-                    col3.metric("Last Data Update", df_metal['date'].iloc[-1].strftime('%Y-%m-%d'))
-                    
-                    fig_candle = go.Figure(data=[go.Candlestick(
-                        x=df_metal['date'], open=df_metal['open'], high=df_metal['high'], low=df_metal['low'], close=df_metal['close'], name=metal_selection
-                    )])
-                    fig_candle.update_layout(xaxis_rangeslider_visible=False, height=380, template="plotly_white", margin=dict(t=40, b=10))
-                    st.plotly_chart(fig_candle, use_container_width=True)
-                else:
-                    st.warning("Data file found, but requested asset classes are empty.")
-            else:
-                st.error(f"⚠️ Failed to pull data from GitHub. HTTP Status Code: {response.status_code}")
-                st.info("Verify that lme_master_data.csv exists at the root folder of your repository branch.")
+            master_df = pd.read_csv(local_csv_path)
+            # st.caption("📡 Data Engine Mode: Native Workspace Sync")
         except Exception as e:
-            st.error(f"❌ Data Stream Error: {e}")
+            st.warning(f"Failed to read local workspace CSV, attempting remote fallback: {e}")
+
+    # --- PHASE 2: REMOTE URL FALLBACK (If Local File is Missing) ---
+    if master_df is None:
+        if "GITHUB_TOKEN" not in st.secrets:
+            st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
+            st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and paste: GITHUB_TOKEN = 'your_token'")
+        else:
+            token = st.secrets["GITHUB_TOKEN"]
+            headers = {"Authorization": f"token {token}"}
+            
+            url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
+            url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
+
+            try:
+                response = requests.get(url_main, headers=headers)
+                if response.status_code == 404:
+                    response = requests.get(url_master, headers=headers)
+                    
+                if response.status_code == 200:
+                    master_df = pd.read_csv(StringIO(response.text))
+                    # st.caption("📡 Data Engine Mode: GitHub API Fallback Sync")
+                else:
+                    st.error(f"⚠️ Failed to pull data from GitHub. HTTP Status Code: {response.status_code}")
+                    st.info("Verify that lme_master_data.csv exists in your repository branch.")
+            except Exception as e:
+                st.error(f"❌ Remote Data Stream Error: {e}")
+
+    # --- PHASE 3: RENDER VISUALIZATION METRICS ---
+    if master_df is not None:
+        try:
+            METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
+            metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
+            
+            df_metal = master_df[master_df['metal'] == metal_selection].copy()
+            df_metal['date'] = pd.to_datetime(df_metal['date'])
+            df_metal = df_metal.sort_values(by='date').reset_index(drop=True)
+            
+            if not df_metal.empty:
+                current_price = df_metal['close'].iloc[-1]
+                prior_price = df_metal['close'].iloc[-2]
+                price_delta = current_price - prior_price
+                pct_delta = (price_delta / prior_price) * 100
+                
+                col1, col2, col3 = st.columns(3)
+                col1.metric(f"LME {metal_selection} Price", f"${current_price:,.2f}", f"{price_delta:+,.2f} ({pct_delta:+.2f}%)")
+                col2.metric("Data Engine Status", "Cloud Synced (Active)")
+                col3.metric("Last Data Update", df_metal['date'].iloc[-1].strftime('%Y-%m-%d'))
+                
+                fig_candle = go.Figure(data=[go.Candlestick(
+                    x=df_metal['date'], open=df_metal['open'], high=df_metal['high'], low=df_metal['low'], close=df_metal['close'], name=metal_selection
+                )])
+                fig_candle.update_layout(xaxis_rangeslider_visible=False, height=380, template="plotly_white", margin=dict(t=40, b=10))
+                st.plotly_chart(fig_candle, use_container_width=True)
+            else:
+                st.warning("Data file found, but requested asset classes are empty.")
+        except Exception as render_error:
+            st.error(f"❌ Dashboard Rendering Anomaly: {render_error}")
 
 # ==============================================================================
 # TAB 2: QUALITATIVE INTELLIGENCE INGESTION ENGINE (THE UPGRADE)
