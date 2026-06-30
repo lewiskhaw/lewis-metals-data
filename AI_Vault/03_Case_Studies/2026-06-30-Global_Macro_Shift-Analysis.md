@@ -4,27 +4,34 @@
 
 ## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance Demand Surges**: As data centers scramble for power, demand for letters of credit has surged.
-- **Increased Digital Trade Interception**: WaveBL and TradeWaltz team up to bring digital trade to Japan. 
-- **Supply Chain Blocks and Currency Corridors**: The UK economy shrank 0.1% in April as the Iran conflict weighed on growth.
+- **Indonesia Mining News Feed Failure**: The inability to access the Indonesia_Mining_News feed indicates potential disruption or lack of transparency in Indonesia's mining sector, which could impact aluminum, copper, and nickel markets.
 
-## Critical Regulatory or Export Policy Shifts out of Primary Supply Hubs
+- **Global Trade Review Highlights**:
+  - GFG Alliance auditor fined for "pervasive" standards breaches, suggesting regulatory scrutiny on major trade players.
+  - IFC, Santander agree US$500mn supply chain finance facility for emerging markets, signaling continued investment in international trade infrastructure.
 
-- **Indonesia Mining News Feed Failure**: Failed to reach node: HTTPSConnectionPool(host='www.indonesiamining.org', port=443): Max retries exceeded with url: /news
-- **Congo Withdraws Unused Cobalt Export Quotas**: All export quotas allocated for January to June that remain unused by June 30 will be forfeited.
-  
+## Critical Regulatory or Export Policy Shifts
+
+- **Indonesia Cobalt Export Quotas Forfeited**: Congo withdraws unused cobalt export quotas, indicating a shift towards more controlled exports. This could affect global cobalt supply and prices.
+
+- **China Steelhome Market Updates**:
+  - Guigang Steel Bar and Wire Rod Project Completes Trial Run: Infrastructure development in China potentially leading to increased steel demand.
+  - CISA member steel producers collectively produced over 20 million tons of crude steel, suggesting significant manufacturing output and potential exports.
+
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **US-Iran Tensions Impact Global Trade**: Mooted US capital rules could harm supply chain finance. Lloyd’s unveils a US$400mn marine war risk consortium for Hormuz ships.
-- **Trade Policy Shifts in Major Hubs**: The Mexico's key export sectors 'pause' long-term investments amid USMCA uncertainty.
-- **Global Currency Fluctuations Affect Trade**: The Japanese yen sinks to 40-year low, keeping intervention risks in focus.
+- **US-China Trade Tensions Escalating**:
+  - China widens Japan export curbs targeting drone makers, nuclear firms, and defense institutes.
+  - Iran declares new Hormuz route 'unacceptable,' warns on transit: Geopolitical tensions in the Middle East affecting oil trade routes and potentially impacting metal prices.
 
-### Strategic Trade Intersections
+- **US Inflation Data**: Core inflation rate hit 3.4% in May (highest since October 2023), indicating persistent price pressures that could lead to tighter monetary policy, influencing global demand for metals.
 
-- **Indonesia and Southeast Asia as Supply Hubs**: Critical policy shifts here could significantly impact global trade flows, especially for non-ferrous metals. 
-- **China's Export Curbs Widened**: Targeting drone makers, nuclear firms, and defense institutes. This could potentially disrupt supply chains.
-- **BRICS+ Trade Corridors**: The US proposes fresh tariffs on 60 economies over forced labor trade practices. 
+- **Congo Cobalt Export Controls**: Forfeiting unused export quotas signals a more controlled approach to resource management and potentially impacts international trade dynamics, especially in battery metals like cobalt and copper.
 
-### Conclusion
+- **Trade Finance Surges**: Demand for letters of credit surges as data centers scramble for power, suggesting a growing need for secure financing mechanisms in critical sectors, affecting supply chains.
 
-The aggregated market intelligence highlights potential shifts in the global macroeconomic landscape. Tensions between the US and Iran continue to impact supply chains, while regulatory changes in key hubs like Indonesia, Congo, China, and within the BRICS+ trade corridors pose significant risks and opportunities. Infrastructure trends towards digital trade show a shift towards more interconnected markets, but also potentially blockaded waters in conflict zones could further strain these intersections. Close monitoring of these intersections is recommended for traders looking to capitalize on emerging trends while navigating risks.
+- **Oil Market Recovery Predictions**: Oil market recovery to be "gradual" even if US-Iran deal holds, IEA says. This could influence the demand and price of metals used alongside oil products.
+
+- **East Africa Trade Finance Sector Challenges**: Amid Middle East storm, suggesting regional economic stability concerns that could impact trade corridors in base metals.
+
+- **China's Economic Dilemma Exposed**: A Chinese start-up's dilemma exposes cracks in Beijing's tech funding machine, indicating potential shifts in investment and economic policies affecting global markets.
