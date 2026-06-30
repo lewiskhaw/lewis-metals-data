@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # --- ENTERPRISE WEB SYNC INITIALIZATION ---
 GITHUB_USERNAME = "lewiskhaw"
 GITHUB_REPO = "lewis-metals-data"
-GITHUB_TOKEN = "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" # Your secret PAT key
+GITHUB_TOKEN = "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" # Your secret PAT key
 FILE_PATH_IN_REPO = "lme_master_data.csv"
 
 # Target local copy fallback path
