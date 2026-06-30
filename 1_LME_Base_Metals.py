@@ -23,8 +23,12 @@ GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
 token = st.secrets["GITHUB_TOKEN"]
 
-url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
-headers = {"Authorization": f"token {token}"}
+# --- OFFICIAL GITHUB API RAW ENDPOINT ROUTE ---
+url = f"https://api.github.com/repos/{GITHUB_USERNAME}/{GITHUB_REPO}/contents/{FILE_PATH}?ref=main"
+headers = {
+    "Authorization": f"token {token}",
+    "Accept": "application/vnd.github.v3.raw"  # Crucial: This tells GitHub to return the raw text data directly
+}
 
 st.info("🔄 Attempting to fetch CSV data array from private cloud repository...")
 
