@@ -2,36 +2,30 @@
 
 # Global Macro Shift Analysis Report
 
-## Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
+## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Indonesia Mining News Feed Failure**: The inability to access the Indonesia_Mining_News feed indicates a potential gap in understanding key developments from this primary supply hub. This could lead to missed insights on export policy changes or infrastructure investments affecting non-ferrous metals trading.
+- **Trade Finance Demand Surge**: The demand for letters of credit has surged as data centers scramble for power, indicating increased trade finance activities globally.
+  
+- **Supply Chain Finance Concerns**: There are warnings that mooted US capital rules could harm supply chain finance, suggesting potential disruptions in financial support for international trade.
 
-- **Global Trade Review Highlights**:
-  - **UK Exporters Roundtable**: Discussion on making UKEF (UK Export Finance) support work for infrastructure projects may impact base metal demand and trade financing in the UK.
-  - **Mexico's Key Export Sectors Pause Long-Term Investments**: This uncertainty could affect global supply chains, particularly in metals trading.
-  - **Trafigura Turns Focus to Prateek Gupta’s Wife After Fraud Ruling**: While not directly related to base metals, significant events in oil and gas trading can impact the broader physical commodities market.
+- **Digital Trade Initiatives**: Companies like HSBC launching trade document-free digital financing products and platforms like WaveBL and TradeWaltz teaming up to bring digital trade to Japan show a growing trend towards digitizing trade processes.
 
-- **Shanghai SteelHome Metals Feed**:
-  - **Congo Withdraws Unused Cobalt Export Quotas**: This shift could affect global cobalt supply dynamics. The forfeit of unused export quotas by June 30 indicates a potential tightening of supply from Congo, which might influence prices and trading volumes in non-ferrous metals.
+## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-## Critical Regulatory or Export Policy Shifts
-
-- **Indonesia Mining News Feed Failure**: The inability to access this feed suggests that there might be recent regulatory or policy changes in Indonesia that could impact the base metal mining and export landscape. Staying updated on any potential shifts is crucial for traders operating in Southeast Asia.
-
-- **China's Widening Export Curbs**: Targeting drone makers, nuclear firms, and defense institutes, these curbs may not directly impact non-ferrous metals but signify a broader trend of China tightening controls on sensitive exports. This could have indirect effects on global trade dynamics and supply chains for base metals.
+- **Indonesia's Cobalt Export Quotas Withdrawal**: Congo has withdrawn unused cobalt export quotas allocated for January to June, which could impact the global cobalt market and supply dynamics.
+  
+- **US-Iran Trade Sanctions**: The US issuing sweeping Iran oil sanctions waivers could unlock billions in revenue for Tehran, potentially shifting trade flows in the Middle East region.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **Core Inflation Rate Hit 3.4% in May**: The highest since October 2023, according to the Fed's preferred gauge, signifies rising inflationary pressures. This could lead to higher metal prices if it prompts monetary policy responses that curb currency liquidity.
+- **Inflation Concerns**: Core inflation rates hitting 3.4% in May (Fed's preferred gauge) and energy inflation being more persistent than expected indicate macroeconomic challenges in the US.
+  
+- **Global Inflation Pressures**: The core inflation rate of 3.2% in the Euro zone, linked to the Iran war pushing energy costs higher, highlights global inflationary pressures.
 
-- **Iran Conflict Impact on Global Trade and Energy Costs**: While primarily affecting oil markets, geopolitical tensions in Iran can disrupt supply chains for base metals by increasing global trade uncertainty. Strategic trade intersections between Middle East dynamics and non-ferrous metals trading could emerge from this context.
+- **Trade Corridor Uncertainties**: China widening Japan export curbs targets drone makers, nuclear firms, and defense institutes, which could affect trade flows between the two countries.
+  
+- **USMCA Uncertainty Impacting Mexico's Key Export Sectors**: Mexico's key export sectors pausing long-term investments amid USMCA uncertainty suggest potential supply chain blocks.
 
-- **USMCA Uncertainty in Mexico's Key Export Sectors**: Pausing long-term investments may lead to supply chain blocks or shifts, affecting the flow of metals and minerals through North American trade corridors. This uncertainty might impact global trade flows and strategic partnerships within BRICS+ nations as well.
+- **Trade Finance Tracker Launch by ICC**: The launch of a tracker to map digital cargo document treaty progress by the ICC could streamline trade processes and reduce barriers, albeit in a small scale initially.
 
-- **Energy Inflation Persistence Threatens Trade Finance**: The higher cost of energy could affect the financing of trade for non-ferrous metals by increasing operational costs and potentially limiting liquidity in trade finance markets.
-
-### Conclusion
-
-The aggregated market intelligence highlights a complex interplay between cross-market infrastructure trends, regulatory shifts, and macroeconomic headwinds. Key areas of concern include understanding the impact of geopolitical tensions on supply chains and the potential tightening of global metal supplies from key hubs like Indonesia and Congo. Export policy changes in China and Mexico could further disrupt trade dynamics across BRICS+ nations and beyond.
-
-For traders and policymakers navigating these shifts, staying informed about infrastructure developments, regulatory changes, and macroeconomic indicators will be crucial. Strategic partnerships and trade corridors within the evolving global economic landscape should also be reassessed for resilience against emerging headwinds.
+These analyses indicate a complex interplay between regulatory changes, macroeconomic headwinds, and shifts in global trade dynamics. Strategic trade intersections seem to be at the crossroads of technology adoption (digitization), geopolitical tensions (trade policies), and economic policies impacting inflation rates globally.
