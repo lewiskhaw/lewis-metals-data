@@ -138,26 +138,47 @@ with tab1:
 # TAB 2: QUALITATIVE INTELLIGENCE INGESTION ENGINE (THE UPGRADE)
 # ==============================================================================
 with tab2:
-    st.header("🔬 Multi-Agent Macro Case Studies")
+    st.header("🔬 Multi-Agent Macro Case Studies & Briefings")
     
     CASE_STUDIES_DIR = "03_Case_Studies"
     
-    # Check if the folder is up one level relative to the page script location
     if not os.path.exists(CASE_STUDIES_DIR):
         CASE_STUDIES_DIR = os.path.join("..", "03_Case_Studies")
 
     def get_available_case_studies():
         if not os.path.exists(CASE_STUDIES_DIR):
             return []
-        files = [f for f in os.listdir(CASE_STUDIES_DIR) if f.endswith(".md")]
-        return sorted(files, reverse=True)
+        # Pull all markdown notes from the unified folder directory
+        return [f for f in os.listdir(CASE_STUDIES_DIR) if f.endswith(".md")]
 
-    available_briefs = get_available_case_studies()
+    all_files = get_available_case_studies()
 
-    if not available_briefs:
+    if not all_files:
         st.info("🛰️ Awaiting initial automated synchronization stream from home desktop ingestion nodes...")
     else:
-        selected_file = st.selectbox("Select Active Briefing File to Review:", available_briefs, key="tab2_brief_select")
+        # Create a dictionary to map cryptic file names to high-impact UI names
+        display_options = {}
+        for f in sorted(all_files, reverse=True):
+            clean_name = f.replace(".md", "")
+            
+            # Label files clearly based on what information they contain
+            if "Global_Macro_Shift" in f:
+                display_options[f] = f"🌐 Macro Shift Analysis: {clean_name.split('-')[0]}-{clean_name.split('-')[1]}-{clean_name.split('-')[2]}"
+            elif "Case_Study_Commodities" in f:
+                display_options[f] = f"⚡ Commodity Case Study: {clean_name[-10:]}"
+            elif "LME_Market_Briefing" in f:
+                display_options[f] = f"📊 LME Pricing Brief: {clean_name[-10:]}"
+            else:
+                display_options[f] = f"📄 Data Asset: {clean_name}"
+
+        # Dropdown selection menu displaying the beautiful labels
+        selected_file = st.selectbox(
+            "Select Target Intelligence Document to Load:", 
+            options=list(display_options.keys()), 
+            format_func=lambda x: display_options[x],
+            key="tab2_brief_select"
+        )
+        
         file_path = os.path.join(CASE_STUDIES_DIR, selected_file)
         
         try:
