@@ -2,39 +2,29 @@
 
 # Global Macro Shift Analysis Report
 
-## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment:
+## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Global Trade Review Insights**:
-  - The integration of digital technologies like AI agents for bank risk pricing intelligence (Mitigram) and digital financing products with minimal trade documentation (HSBC) indicates a shift towards more automated and efficient cross-market infrastructure.
-  - Key sectors in Mexico, South Sudan, and Japan have shown signs of pausing long-term investments amid uncertainty, highlighting potential shifts in infrastructure spending and supply dynamics.
+- **Trade Finance Demand Surges**: As data centers scramble for power, demand for letters of credit has surged.
+- **Increased Digital Trade Interception**: WaveBL and TradeWaltz team up to bring digital trade to Japan. 
+- **Supply Chain Blocks and Currency Corridors**: The UK economy shrank 0.1% in April as the Iran conflict weighed on growth.
 
-- **CNBC Economy Highlights**:
-  - The UN's pause in Hormuz ship evacuation plans after a vessel attack reflects the fragile security situation in strategic trade intersections.
-  - Fluctuations in currency values, especially the Japanese yen reaching a 40-year low, impact cross-border trade dynamics.
+## Critical Regulatory or Export Policy Shifts out of Primary Supply Hubs
 
-## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs:
-
-- **Indonesia Mining News Feed**:
-  - The failed attempt to reach `www.indonesiamining.org` suggests potential disruptions or changes in regulatory data availability from Indonesia, a significant non-ferrous metals supplier.
+- **Indonesia Mining News Feed Failure**: Failed to reach node: HTTPSConnectionPool(host='www.indonesiamining.org', port=443): Max retries exceeded with url: /news
+- **Congo Withdraws Unused Cobalt Export Quotas**: All export quotas allocated for January to June that remain unused by June 30 will be forfeited.
   
-- **Global Trade Review**:
-  - StanChart and UKEF's agreement on a €198mn facility for Cameroon road projects signals increased international cooperation in infrastructure financing, potentially affecting export policies and funding access.
+## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks:
+- **US-Iran Tensions Impact Global Trade**: Mooted US capital rules could harm supply chain finance. Lloyd’s unveils a US$400mn marine war risk consortium for Hormuz ships.
+- **Trade Policy Shifts in Major Hubs**: The Mexico's key export sectors 'pause' long-term investments amid USMCA uncertainty.
+- **Global Currency Fluctuations Affect Trade**: The Japanese yen sinks to 40-year low, keeping intervention risks in focus.
 
-- **Trade Finance News | Global Trade Review (GTR)**:
-  - Mooted US capital rules could harm supply chain finance, indicating potential regulatory headwinds that affect trade flows and financing options.
-  
-- **CNBC Economy Analysis**:
-  - The widening of Japan export curbs by China targets drone makers, nuclear firms, and defense institutes, showcasing geopolitical tensions influencing trade dynamics in the BRICS+ context.
-  - The US proposing fresh tariffs on 60 economies over forced labor trade practices could further complicate global supply chains.
+### Strategic Trade Intersections
 
-## Strategic Trade Intersections:
+- **Indonesia and Southeast Asia as Supply Hubs**: Critical policy shifts here could significantly impact global trade flows, especially for non-ferrous metals. 
+- **China's Export Curbs Widened**: Targeting drone makers, nuclear firms, and defense institutes. This could potentially disrupt supply chains.
+- **BRICS+ Trade Corridors**: The US proposes fresh tariffs on 60 economies over forced labor trade practices. 
 
-- **Trade Corridor Vulnerabilities**:
-  - Fragile confidence threatening recovery in the Strait of Hormuz highlights strategic vulnerabilities in key trade intersections, affected by geopolitical tensions and security concerns.
-  
-- **Infrastructure Financing Models**:
-  - The cooperation between entities like StanChart, UKEF, and IFC with Santander for supply chain finance facilities indicates evolving infrastructure financing models that could impact global trade routes.
+### Conclusion
 
-This analysis reveals a complex interplay of digital transformation, regulatory shifts, geopolitical tensions, and evolving macroeconomic conditions. These factors collectively influence cross-market infrastructure trends, base metal warehouse stock sentiment, and the broader landscape of international trade corridors.
+The aggregated market intelligence highlights potential shifts in the global macroeconomic landscape. Tensions between the US and Iran continue to impact supply chains, while regulatory changes in key hubs like Indonesia, Congo, China, and within the BRICS+ trade corridors pose significant risks and opportunities. Infrastructure trends towards digital trade show a shift towards more interconnected markets, but also potentially blockaded waters in conflict zones could further strain these intersections. Close monitoring of these intersections is recommended for traders looking to capitalize on emerging trends while navigating risks.
