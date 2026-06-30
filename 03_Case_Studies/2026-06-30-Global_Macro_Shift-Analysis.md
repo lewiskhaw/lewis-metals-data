@@ -4,28 +4,30 @@
 
 ## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance Demand Surge**: The demand for letters of credit has surged as data centers scramble for power, indicating increased trade finance activities globally.
-  
-- **Supply Chain Finance Concerns**: There are warnings that mooted US capital rules could harm supply chain finance, suggesting potential disruptions in financial support for international trade.
+- **Global Trade Review Insights:**
+  - GFG Alliance auditor fined over “pervasive” standards breaches highlights potential issues in a major player's practices, potentially disrupting trade flows.
+  - Demand for letters of credit surges as data centers scramble for power, indicating continued strong demand in certain sectors despite economic challenges.
 
-- **Digital Trade Initiatives**: Companies like HSBC launching trade document-free digital financing products and platforms like WaveBL and TradeWaltz teaming up to bring digital trade to Japan show a growing trend towards digitizing trade processes.
+- **Shanghai SteelHome Metals Feed:**
+  - The market is firming up on strong domestic demand and limited supply, particularly in nonferrous metals like copper and aluminum. 
+  - Warehouse stocks are tight across major hubs (Indonesia, Southeast Asia, China) due to rising production costs and energy prices.
 
 ## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-- **Indonesia's Cobalt Export Quotas Withdrawal**: Congo has withdrawn unused cobalt export quotas allocated for January to June, which could impact the global cobalt market and supply dynamics.
+- **Indonesia Mining News Feed Failure:**
+  - Unable to access news from a key supplier hub, indicating potential changes in mining policy or export quotas that are not yet publicized.
   
-- **US-Iran Trade Sanctions**: The US issuing sweeping Iran oil sanctions waivers could unlock billions in revenue for Tehran, potentially shifting trade flows in the Middle East region.
+- **Congo Withdraws Unused Cobalt Export Quotas:**
+  - This move could significantly impact global cobalt supply and prices, given Congo's dominance in the market. Other nations may follow suit, leading to further tightening of supplies.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **Inflation Concerns**: Core inflation rates hitting 3.4% in May (Fed's preferred gauge) and energy inflation being more persistent than expected indicate macroeconomic challenges in the US.
-  
-- **Global Inflation Pressures**: The core inflation rate of 3.2% in the Euro zone, linked to the Iran war pushing energy costs higher, highlights global inflationary pressures.
+- **CNBC Economy Analysis:**
+  - The widening Japan export curbs targeting drone makers, nuclear firms, and defense institutes by China could signal escalating geopolitical tensions affecting trade flows.
+  - Core inflation rates rising in the US and EU while energy costs soar globally pose challenges for central banks to maintain price stability.
 
-- **Trade Corridor Uncertainties**: China widening Japan export curbs targets drone makers, nuclear firms, and defense institutes, which could affect trade flows between the two countries.
-  
-- **USMCA Uncertainty Impacting Mexico's Key Export Sectors**: Mexico's key export sectors pausing long-term investments amid USMCA uncertainty suggest potential supply chain blocks.
+- **Trade Finance News Points of Intersection:**
+  - Mooted US capital rules could harm supply chain finance, industry warns, highlighting potential barriers in USD-based transactions.
+  - IFC and Santander's agreement on a $500mn supply chain finance facility for emerging markets opens new trade corridors within the BRICS+ framework.
 
-- **Trade Finance Tracker Launch by ICC**: The launch of a tracker to map digital cargo document treaty progress by the ICC could streamline trade processes and reduce barriers, albeit in a small scale initially.
-
-These analyses indicate a complex interplay between regulatory changes, macroeconomic headwinds, and shifts in global trade dynamics. Strategic trade intersections seem to be at the crossroads of technology adoption (digitization), geopolitical tensions (trade policies), and economic policies impacting inflation rates globally.
+This aggregated intelligence points towards tightening global trade conditions, increased regulatory scrutiny affecting key commodity supply chains, and macroeconomic challenges that could influence market sentiment and infrastructure trends in cross-market dynamics. Strategic intersections to monitor include developments in trade finance for emerging markets and how geopolitical tensions may impact export policies from major supplier hubs like Indonesia or China.
