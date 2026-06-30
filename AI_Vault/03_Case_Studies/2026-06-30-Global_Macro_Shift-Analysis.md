@@ -2,34 +2,36 @@
 
 # Global Macro Shift Analysis Report
 
-## Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment:
+## Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance News:** Demand for letters of credit surges as data centers scramble for power, indicating potential strain on energy infrastructure to support growing trade finance needs.
-- **GFG Alliance Auditor Fined Over “Pervasive” Standards Breaches**: This highlights potential risks in cross-market supply chains and the need for stricter compliance standards.
+- **Indonesia Mining News Feed Failure**: The inability to access the Indonesia_Mining_News feed indicates a potential gap in understanding key developments from this primary supply hub. This could lead to missed insights on export policy changes or infrastructure investments affecting non-ferrous metals trading.
 
-## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs:
+- **Global Trade Review Highlights**:
+  - **UK Exporters Roundtable**: Discussion on making UKEF (UK Export Finance) support work for infrastructure projects may impact base metal demand and trade financing in the UK.
+  - **Mexico's Key Export Sectors Pause Long-Term Investments**: This uncertainty could affect global supply chains, particularly in metals trading.
+  - **Trafigura Turns Focus to Prateek Gupta’s Wife After Fraud Ruling**: While not directly related to base metals, significant events in oil and gas trading can impact the broader physical commodities market.
 
-- **Indonesia's Unused Cobalt Export Quotas Forfeited:** Congo withdrawing unused export quotas for January to June demonstrates a tightening regulatory environment on cobalt exports, potentially impacting global supply.
-- **China Widens Japan Export Curbs**: Targeting drone makers, nuclear firms, and defense institutes, China's expanded export controls could disrupt sensitive technology trade flows.
+- **Shanghai SteelHome Metals Feed**:
+  - **Congo Withdraws Unused Cobalt Export Quotas**: This shift could affect global cobalt supply dynamics. The forfeit of unused export quotas by June 30 indicates a potential tightening of supply from Congo, which might influence prices and trading volumes in non-ferrous metals.
 
-## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks:
+## Critical Regulatory or Export Policy Shifts
 
-- **UN Agency Pauses Hormuz Ship Evacuation Plan After Vessel Attack**: Geopolitical tensions in the Strait of Hormuz threaten oil market recovery, impacting trade routes crucial for BRICS+ economies.
-- **US Capital Rules Could Harm Supply Chain Finance**: Mooted US regulatory changes warn of potential constraints on cross-border financing, risking supply chain disruptions globally.
+- **Indonesia Mining News Feed Failure**: The inability to access this feed suggests that there might be recent regulatory or policy changes in Indonesia that could impact the base metal mining and export landscape. Staying updated on any potential shifts is crucial for traders operating in Southeast Asia.
 
-## Strategic Trade Intersections:
+- **China's Widening Export Curbs**: Targeting drone makers, nuclear firms, and defense institutes, these curbs may not directly impact non-ferrous metals but signify a broader trend of China tightening controls on sensitive exports. This could have indirect effects on global trade dynamics and supply chains for base metals.
 
-- **StanChart, UKEF Agree €198mn Facility for Cameroon Road Project**: Public-private partnerships in infrastructure development crucial for BRICS+ economies, signifying strategic trade intersections.
-- **IFC, Santander Agree US$500mn Supply Chain Finance Facility for Emerging Markets**: Private sector collaboration with development finance institutions supports emerging market resilience.
+## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-## Conclusion:
+- **Core Inflation Rate Hit 3.4% in May**: The highest since October 2023, according to the Fed's preferred gauge, signifies rising inflationary pressures. This could lead to higher metal prices if it prompts monetary policy responses that curb currency liquidity.
 
-The aggregated data shows a complex macroeconomic landscape. Cross-market infrastructure trends and regulatory shifts in primary supply hubs like Indonesia and China are key drivers of global trade dynamics. Geopolitical tensions, such as those in the Strait of Hormuz, pose significant risks to BRICS+ trade corridors. Meanwhile, evolving US capital rules and export policies could disrupt international supply chains. Strategic intersections between public and private sector actors remain crucial for emerging market resilience.
+- **Iran Conflict Impact on Global Trade and Energy Costs**: While primarily affecting oil markets, geopolitical tensions in Iran can disrupt supply chains for base metals by increasing global trade uncertainty. Strategic trade intersections between Middle East dynamics and non-ferrous metals trading could emerge from this context.
 
-To navigate these challenges effectively, policymakers should prioritize:
-1. Strengthening cross-border infrastructure to support growing trade finance needs.
-2. Enhancing compliance standards in global supply chains to mitigate pervasive risks.
-3. Facilitating strategic partnerships between public-private sectors in key economic intersections.
-4. Monitoring and mitigating geopolitical risks that threaten critical trade routes.
+- **USMCA Uncertainty in Mexico's Key Export Sectors**: Pausing long-term investments may lead to supply chain blocks or shifts, affecting the flow of metals and minerals through North American trade corridors. This uncertainty might impact global trade flows and strategic partnerships within BRICS+ nations as well.
 
-By proactively addressing these areas, economies can foster a more stable and resilient macroeconomic environment conducive to growth and development.
+- **Energy Inflation Persistence Threatens Trade Finance**: The higher cost of energy could affect the financing of trade for non-ferrous metals by increasing operational costs and potentially limiting liquidity in trade finance markets.
+
+### Conclusion
+
+The aggregated market intelligence highlights a complex interplay between cross-market infrastructure trends, regulatory shifts, and macroeconomic headwinds. Key areas of concern include understanding the impact of geopolitical tensions on supply chains and the potential tightening of global metal supplies from key hubs like Indonesia and Congo. Export policy changes in China and Mexico could further disrupt trade dynamics across BRICS+ nations and beyond.
+
+For traders and policymakers navigating these shifts, staying informed about infrastructure developments, regulatory changes, and macroeconomic indicators will be crucial. Strategic partnerships and trade corridors within the evolving global economic landscape should also be reassessed for resilience against emerging headwinds.
