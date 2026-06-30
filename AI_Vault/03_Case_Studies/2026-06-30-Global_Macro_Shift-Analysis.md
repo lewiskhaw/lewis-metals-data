@@ -2,28 +2,26 @@
 
 # Global Macro Shift Analysis Report
 
-## Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
+## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance Demand Surges**: Data centers scrambling for power has led to a significant increase in demand for letters of credit, highlighting the growing need for trade finance in energy-hungry sectors.
+- **Trade Finance Demand Surges:** The demand for letters of credit has surged as data centers scramble for power, indicating increased trade finance activity across various sectors.
   
-- **Strategic Trade Intersections**:
-  - GFG Alliance auditor fined over “pervasive” standards breaches indicates potential regulatory scrutiny and compliance risks in global trade networks.
-  - Miga joining IFC trade finance programme with US$500mn guarantee capacity shows increased support for trade finance in emerging markets, potentially opening new avenues for investment.
+- **Supply Chain Finance Concerns:** Industry warns that mooted US capital rules could harm supply chain finance. This suggests potential regulatory headwinds in the US that could impact global trade flows.
+
+- **Strategic Trade Corridors Formation:** Notable partnerships and facilities, such as the €198mn facility for Cameroon road project agreed upon by StanChart and UKEF, indicate a strengthening of strategic trade corridors between UK and Africa.
 
 ## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-- **Indonesia**: Former education minister jailed for 10 years in Google Chromebook graft case highlights the country's commitment to tackling corruption and graft within its mining and export sectors.
-  
-- **China Export Curbs Widen**: Expanding restrictions on Japan, targeting drone makers, nuclear firms, and defense institutes showcases China's increasing control over strategic exports.
+- **Indonesia Withdraws Unused Cobalt Export Quotas:** Congo withdraws unused cobalt export quotas, which could lead to higher stockpiling in Indonesia and potential price fluctuations for cobalt. This also suggests a tightening of export controls in key supply hubs like Southeast Asia.
+
+- **US-Iran Trade Blocks:** US proposes fresh tariffs on 60 economies over forced labor trade practices, highlighting potential trade blocks due to geopolitical tensions, especially between the US and Iran.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **Iran War Impact**: Core inflation in the US hitting 3.4% in May, driven by energy costs, signals potential global economic disruption from geopolitical tensions.
-  
-- **Trade Dynamics**:
-  - UK exporters discussing UKEF support highlights challenges faced by European economies in securing infrastructure funding amid international trade uncertainty.
-  - Mexico's key export sectors 'pausing' long-term investments due to USMCA uncertainty demonstrates the vulnerability of regional trade within established economic blocs.
+- **Energy Inflation Persistence:** Core inflation rate hit 3.4% in May (US), with energy inflation being more persistent than expected. This points towards significant macroeconomic headwinds due to high energy costs.
 
-- **China Tech Funding Cracks**: The dilemma faced by a Chinese start-up exposes potential weaknesses in Beijing's tech funding machine, potentially impacting China's global technological supremacy.
+- **Trade Relations Shifts:** China widens Japan export curbs, targeting drone makers, nuclear firms, and defense institutes. This signals a shift in trade relations between China and other major economies like Japan, possibly affecting BRICS+ trade corridors.
 
-The data suggests a complex interplay between regulatory shifts, geopolitical tensions, and macroeconomic dynamics. Strategic intersections, such as the growth of trade finance in emerging markets and increased scrutiny over global supply chains, are key areas to monitor for future market trends and investment opportunities.
+- **Supply Chain Vulnerabilities:** Long-term unemployment surges in the US, costing workers and the economy. This indicates potential vulnerabilities in supply chains due to persistent job losses and economic uncertainty.
+
+These analyses indicate an environment of increased regulatory scrutiny, evolving international trade dynamics, and significant macroeconomic challenges that could impact global trade flows and physical non-ferrous metals trading floors. Strategic attention should be paid to emerging trends in trade finance, the implications of US-Iran tensions on global trade blocks, and how major economies manage inflationary pressures amidst these shifts.
