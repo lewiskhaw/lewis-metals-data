@@ -4,28 +4,44 @@
 
 ## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance Demand Surge**: The demand for letters of credit has surged as data centers scramble for power, indicating increased trade finance activities globally.
-  
-- **Supply Chain Finance Concerns**: There are warnings that mooted US capital rules could harm supply chain finance, suggesting potential disruptions in financial support for international trade.
-
-- **Digital Trade Initiatives**: Companies like HSBC launching trade document-free digital financing products and platforms like WaveBL and TradeWaltz teaming up to bring digital trade to Japan show a growing trend towards digitizing trade processes.
+- **Global Trade Review:**
+  - The GTR Leaders in Trade 2026 event showcases key players and developments across the trade finance sector, highlighting major infrastructure trends.
+  - Notable shifts include demand surges for letters of credit and the launch of digital financing products by HSBC, suggesting a move towards more streamlined and secure cross-market transactions.
 
 ## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-- **Indonesia's Cobalt Export Quotas Withdrawal**: Congo has withdrawn unused cobalt export quotas allocated for January to June, which could impact the global cobalt market and supply dynamics.
+- **Indonesia Mining News:**
+  - Unable to reach node due to network errors. Further investigation needed.
   
-- **US-Iran Trade Sanctions**: The US issuing sweeping Iran oil sanctions waivers could unlock billions in revenue for Tehran, potentially shifting trade flows in the Middle East region.
+- **CNBC Economy:**
+  - China's widening export curbs, targeting drone makers, nuclear firms, and defense institutes, could impact the supply chain of critical components, potentially leading to price fluctuations in related metals.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **Inflation Concerns**: Core inflation rates hitting 3.4% in May (Fed's preferred gauge) and energy inflation being more persistent than expected indicate macroeconomic challenges in the US.
+- **Global Trade Review:**
+  - The discussion on potential US capital rules harming supply chain finance warns of macroeconomic headwinds that could disrupt global trade flows.
+  - Mention of a $198mn facility for Cameroon road project shows investment in infrastructure, crucial for smooth trade corridors.
+
+- **CNBC Economy:**
+  - Core inflation rates rising to 3.4% in May and the Fed's preferred gauge show economic tension, potentially influencing currency values and trade dynamics within BRICS+ nations.
+  - Earthquake-related job cuts and energy cost increases highlight supply chain blocks that could further impact global trade balances.
+
+- **Shanghai SteelHome Metals:**
+  - Reports on China's iron ore trading and thermal coal prices indicate a focus on the raw material costs that underpin global manufacturing. This is crucial for base metals like copper, zinc, and aluminum, which are used in industrial production.
+  - Changes in BOF, EAF operating rates, and steel capacity utilization reflect direct impacts on physical metals availability and pricing.
+
+## Strategic Trade Intersections
+
+- **Global Trade Review:**
+  - The collaboration between WaveBL and TradeWaltz to introduce digital trade in Japan could be a harbinger of significant shifts towards more tech-driven, seamless international trade transactions.
+  - Miga joining the IFC trade finance program with $500mn guarantee capacity emphasizes strategic investment into ensuring smooth global trade.
+
+- **CNBC Economy:**
+  - The UN agency's consideration for Hormuz ship evacuation plans amidst geopolitical tensions underscores the strategic importance of maintaining open sea lanes for global trade and energy security.
   
-- **Global Inflation Pressures**: The core inflation rate of 3.2% in the Euro zone, linked to the Iran war pushing energy costs higher, highlights global inflationary pressures.
+- **Shanghai SteelHome Metals:**
+  - The Guigang Steel Bar and Wire Rod Project's completion trial run signifies advancements in infrastructure, directly impacting metals demand. This could signal broader economic growth patterns in China.
 
-- **Trade Corridor Uncertainties**: China widening Japan export curbs targets drone makers, nuclear firms, and defense institutes, which could affect trade flows between the two countries.
-  
-- **USMCA Uncertainty Impacting Mexico's Key Export Sectors**: Mexico's key export sectors pausing long-term investments amid USMCA uncertainty suggest potential supply chain blocks.
+---
 
-- **Trade Finance Tracker Launch by ICC**: The launch of a tracker to map digital cargo document treaty progress by the ICC could streamline trade processes and reduce barriers, albeit in a small scale initially.
-
-These analyses indicate a complex interplay between regulatory changes, macroeconomic headwinds, and shifts in global trade dynamics. Strategic trade intersections seem to be at the crossroads of technology adoption (digitization), geopolitical tensions (trade policies), and economic policies impacting inflation rates globally.
+**Note:** Data from the Indonesia Mining News source was not successfully retrieved due to network errors. Further attempts to connect should be made for comprehensive analysis.
