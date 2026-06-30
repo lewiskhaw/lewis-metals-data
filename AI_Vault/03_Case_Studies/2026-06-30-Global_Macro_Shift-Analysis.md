@@ -4,24 +4,45 @@
 
 ## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Trade Finance Demand Surges:** The demand for letters of credit has surged as data centers scramble for power, indicating increased trade finance activity across various sectors.
-  
-- **Supply Chain Finance Concerns:** Industry warns that mooted US capital rules could harm supply chain finance. This suggests potential regulatory headwinds in the US that could impact global trade flows.
+- **Indonesia Mining News Feed Failure**: The inability to reach the Indonesia_Mining_News node suggests potential disconnects in Southeast Asia's mining infrastructure, impacting real-time data flow for commodity sentiment analysis.
 
-- **Strategic Trade Corridors Formation:** Notable partnerships and facilities, such as the €198mn facility for Cameroon road project agreed upon by StanChart and UKEF, indicate a strengthening of strategic trade corridors between UK and Africa.
+- **Global Trade Review Highlights**:
+  - Mooted US capital rules could harm supply chain finance
+  - Demand for letters of credit surges as data centers scramble for power
+  - ICC launches tracker to map digital cargo document treaty progress
+
+These trade finance and energy-related points indicate significant shifts in international infrastructure supporting physical commodity markets, potentially disrupting base metal price stability.
 
 ## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-- **Indonesia Withdraws Unused Cobalt Export Quotas:** Congo withdraws unused cobalt export quotas, which could lead to higher stockpiling in Indonesia and potential price fluctuations for cobalt. This also suggests a tightening of export controls in key supply hubs like Southeast Asia.
+- **Congo Withdraws Unused Cobalt Export Quotas**: This indicates a tightening regulatory stance on cobalt exports from Congo, likely due to geopolitical tensions or economic policy shifts. Given Congo's outsized importance in global cobalt supply, this could lead to base metal price imbalances.
 
-- **US-Iran Trade Blocks:** US proposes fresh tariffs on 60 economies over forced labor trade practices, highlighting potential trade blocks due to geopolitical tensions, especially between the US and Iran.
+- **China Widens Japan Export Curbs**: Targeting drone makers, nuclear firms, and defense institutes, China's expanded export restrictions on sensitive technologies signal potential trade friction impacts on broader non-ferrous metals trade dynamics.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **Energy Inflation Persistence:** Core inflation rate hit 3.4% in May (US), with energy inflation being more persistent than expected. This points towards significant macroeconomic headwinds due to high energy costs.
+- **Core Inflation Rate Hit 3.4% in May**: This is the highest since October 2023, according to Fed's preferred gauge. Elevated inflation rates globally could lead to tighter monetary policies, risking global economic slowdowns impacting trade.
 
-- **Trade Relations Shifts:** China widens Japan export curbs, targeting drone makers, nuclear firms, and defense institutes. This signals a shift in trade relations between China and other major economies like Japan, possibly affecting BRICS+ trade corridors.
+- **Strait of Hormuz Shipping Rebounds but Fragile Confidence Threatens Recovery**: Tensions in this critical oil and gas shipping route also pose broader supply chain risks for non-ferrous metals traders, even if focused on energy commodities. 
 
-- **Supply Chain Vulnerabilities:** Long-term unemployment surges in the US, costing workers and the economy. This indicates potential vulnerabilities in supply chains due to persistent job losses and economic uncertainty.
+- **U.S., Iran Intensify Attacks as Ceasefire Frays, Peace Talks Stall**: Heightened geopolitical tensions could further disrupt global trade corridors, especially between BRICS+ nations, potentially impacting metal trade flows.
 
-These analyses indicate an environment of increased regulatory scrutiny, evolving international trade dynamics, and significant macroeconomic challenges that could impact global trade flows and physical non-ferrous metals trading floors. Strategic attention should be paid to emerging trends in trade finance, the implications of US-Iran tensions on global trade blocks, and how major economies manage inflationary pressures amidst these shifts.
+### Strategic Trade Intersections
+
+1. **US Capital Rules and Supply Chain Finance**: Regulatory changes here have the potential to reshape global commodity finance infrastructure, directly impacting trade in base metals.
+   
+2. **China-Japan Export Tensions**: Expanded export curbs out of China could lead to broader regional trade tensions, potentially disrupting Southeast Asia's critical role as a non-ferrous metals supply hub.
+
+3. **Congo Cobalt Export Policy Shifts**: Regulatory changes in cobalt exports from Congo have the potential to reshape global battery metal markets, impacting broader base metal price stability.
+
+4. **USMCA Uncertainty and Mexico’s Key Export Sectors**: Pausing long-term investments threatens cross-border trade flows, with implications for both U.S. and Canadian metals industries.
+
+5. **Energy Price Shocks and ECB Rate Decisions**: The ECB's first interest rate hike since 2023 to combat inflation comes amid surging energy prices, threatening to tighten monetary conditions further, impacting metal trade finance.
+
+In summary, the aggregated intelligence highlights critical global macro shifts in non-ferrous metals markets:
+
+- Regulatory and policy changes out of primary supply hubs 
+- Cross-market infrastructure challenges affecting commodity finance
+- Macroeconomic headwinds potentially tightening financial conditions
+
+These intersecting trends signal a complex operating environment for global base metal traders, with potential price volatility and trade friction risks to navigate. Strategic responses may include bolstering regional supply chains, hedging strategies, and staying agile in the face of evolving geopolitical and economic pressures.
