@@ -148,7 +148,6 @@ with tab2:
     def get_available_case_studies():
         if not os.path.exists(CASE_STUDIES_DIR):
             return []
-        # Pull all markdown notes from the unified folder directory
         return [f for f in os.listdir(CASE_STUDIES_DIR) if f.endswith(".md")]
 
     all_files = get_available_case_studies()
@@ -156,18 +155,21 @@ with tab2:
     if not all_files:
         st.info("🛰️ Awaiting initial automated synchronization stream from home desktop ingestion nodes...")
     else:
-        # Create a dictionary to map cryptic file names to high-impact UI names
         display_options = {}
         for f in sorted(all_files, reverse=True):
             clean_name = f.replace(".md", "")
             
-            # Label files clearly based on what information they contain
+            # Extract date safely using a 10-character boundary matching regular expression pattern
+            date_match = re.search(r'\d{4}-\d{2}-\d{2}', f)
+            extracted_date = date_match.group(0) if date_match else today_str
+            
+            # Resilient label distribution matrix
             if "Global_Macro_Shift" in f:
-                display_options[f] = f"🌐 Macro Shift Analysis: {clean_name.split('-')[0]}-{clean_name.split('-')[1]}-{clean_name.split('-')[2]}"
+                display_options[f] = f"🌐 Macro Shift Analysis: {extracted_date}"
             elif "Case_Study_Commodities" in f:
-                display_options[f] = f"⚡ Commodity Case Study: {clean_name[-10:]}"
+                display_options[f] = f"⚡ Commodity Case Study: {extracted_date}"
             elif "LME_Market_Briefing" in f:
-                display_options[f] = f"📊 LME Pricing Brief: {clean_name[-10:]}"
+                display_options[f] = f"📊 LME Pricing Brief: {extracted_date}"
             else:
                 display_options[f] = f"📄 Data Asset: {clean_name}"
 
@@ -182,8 +184,8 @@ with tab2:
         file_path = os.path.join(CASE_STUDIES_DIR, selected_file)
         
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                raw_markdown = f.read()
+            with open(file_path, "r", encoding="utf-8") as f_content:
+                raw_markdown = f_content.read()
             clean_markdown = re.sub(r'\[\[(.*?)\]\]', r'**\1**', raw_markdown)
             st.markdown("---")
             st.markdown(clean_markdown)
