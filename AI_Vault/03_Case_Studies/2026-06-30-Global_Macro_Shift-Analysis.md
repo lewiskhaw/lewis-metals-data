@@ -4,34 +4,34 @@
 
 ## Major Cross-Market Infrastructure Trends and Base Metal Warehouse Stock Sentiment
 
-- **Indonesia Mining News Feed Failure**: The inability to access the Indonesia_Mining_News feed indicates potential disruption or lack of transparency in Indonesia's mining sector, which could impact aluminum, copper, and nickel markets.
+- **Trade Finance Demand Surge**: Data centers scrambling for power has led to a significant increase in demand for letters of credit, indicating potential investment opportunities in the energy sector.
+  
+- **Digital Transformation in Trade**: The launch of digital financing products by major banks like HSBC signals a shift towards more efficient and transparent trade processes. This trend is likely to accelerate as more financial institutions adopt similar technologies.
 
-- **Global Trade Review Highlights**:
-  - GFG Alliance auditor fined for "pervasive" standards breaches, suggesting regulatory scrutiny on major trade players.
-  - IFC, Santander agree US$500mn supply chain finance facility for emerging markets, signaling continued investment in international trade infrastructure.
+## Critical Regulatory or Export Policy Shifts Out of Primary Supply Hubs
 
-## Critical Regulatory or Export Policy Shifts
-
-- **Indonesia Cobalt Export Quotas Forfeited**: Congo withdraws unused cobalt export quotas, indicating a shift towards more controlled exports. This could affect global cobalt supply and prices.
-
-- **China Steelhome Market Updates**:
-  - Guigang Steel Bar and Wire Rod Project Completes Trial Run: Infrastructure development in China potentially leading to increased steel demand.
-  - CISA member steel producers collectively produced over 20 million tons of crude steel, suggesting significant manufacturing output and potential exports.
+- **Indonesia Cobalt Export Quotas Withdrawn**: Congo's decision to withdraw unused cobalt export quotas for the period January-June could lead to a tightening of supply in the global cobalt market, potentially impacting downstream industries like EV batteries.
+  
+- **USMCA Uncertainty Impacting Mexican Exports**: Key Mexican export sectors have paused long-term investments amid uncertainty regarding the US-Mexico-Canada Agreement (USMCA), which may disrupt trade flows and investment decisions.
 
 ## Macroeconomic Headwinds, Currency/BRICS+ Trade Corridors, and Supply Chain Blocks
 
-- **US-China Trade Tensions Escalating**:
-  - China widens Japan export curbs targeting drone makers, nuclear firms, and defense institutes.
-  - Iran declares new Hormuz route 'unacceptable,' warns on transit: Geopolitical tensions in the Middle East affecting oil trade routes and potentially impacting metal prices.
+- **Iran Conflict Impacting Global Energy Prices**: The ongoing Iran conflict has led to a significant increase in energy prices globally. This trend is expected to persist as the ECB prepares to hike interest rates for the first time since 2023.
 
-- **US Inflation Data**: Core inflation rate hit 3.4% in May (highest since October 2023), indicating persistent price pressures that could lead to tighter monetary policy, influencing global demand for metals.
+- **Trade Tensions Between US and China**: The US's proposal for fresh tariffs on 60 economies over forced labor trade practices could further escalate trade tensions between the US and China, potentially disrupting global supply chains.
 
-- **Congo Cobalt Export Controls**: Forfeiting unused export quotas signals a more controlled approach to resource management and potentially impacts international trade dynamics, especially in battery metals like cobalt and copper.
+- **BRICS+ Trade Expansion**: As BRICS countries (Brazil, Russia, India, China, South Africa) continue to expand their economic ties with other emerging economies, there may be opportunities for growth in non-traditional trade corridors. However, this expansion could also lead to increased competition and potential trade disputes.
 
-- **Trade Finance Surges**: Demand for letters of credit surges as data centers scramble for power, suggesting a growing need for secure financing mechanisms in critical sectors, affecting supply chains.
+- **Supply Chain Blocks Due to Geopolitical Tensions**: The US-Iran escalating attacks are likely to cause further disruptions in the Strait of Hormuz, affecting global oil markets and trade flows through the region.
 
-- **Oil Market Recovery Predictions**: Oil market recovery to be "gradual" even if US-Iran deal holds, IEA says. This could influence the demand and price of metals used alongside oil products.
+## Strategic Trade Intersections
 
-- **East Africa Trade Finance Sector Challenges**: Amid Middle East storm, suggesting regional economic stability concerns that could impact trade corridors in base metals.
+- **Cobalt Supply from Congo**: The withdrawal of unused cobalt export quotas by Congo could lead to a tightening of supply globally. Investors should closely monitor this development for potential investment opportunities in the cobalt market.
+  
+- **Energy Prices Impacting Global Trade**: The impact of Iran conflict-related energy price hikes is significant and likely to continue. This trend will influence trade decisions across various sectors, particularly affecting economies heavily reliant on imported energy.
 
-- **China's Economic Dilemma Exposed**: A Chinese start-up's dilemma exposes cracks in Beijing's tech funding machine, indicating potential shifts in investment and economic policies affecting global markets.
+- **Digitalization in Trade Finance**: The adoption of digital financing products like HSBC's trade document-free offering signals a shift towards more efficient global trade processes. Financial institutions should consider investing in these technologies to remain competitive.
+  
+- **USMCA Uncertainty Affecting Mexican Exports**: The pause in long-term investments due to USMCA uncertainty could disrupt Mexico's export sectors. This may lead to investment opportunities but also pose risks for companies relying on the USMCA trade corridor.
+
+This analysis highlights key trends and potential shifts in the global macroeconomic landscape, focusing on infrastructure developments, regulatory changes, and geopolitical tensions that may impact cross-market dynamics and base metal trading floors.
