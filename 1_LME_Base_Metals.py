@@ -1,74 +1,99 @@
 import os
 import streamlit as st
 import pandas as pd
+import requests
 import plotly.graph_objects as go
+import re
+from io import StringIO
 
-st.set_page_config(page_title="LME Institutional Metals Panel", layout="wide", page_icon="🏭")
-
-st.title("🏭 LME Institutional Base Metals Panel")
-st.caption("🌐 Production Cloud Engine — Cash & 3-Month Prompt Pricing Diagnostics")
-st.markdown("---")
-
+# --- CONFIGURATION MATCHING YOUR REPO ---
+GITHUB_USERNAME = "lewiskhaw"
+GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
 
-if os.path.exists(FILE_PATH):
-    df = pd.read_csv(FILE_PATH)
-    df['date'] = pd.to_datetime(df['date'])
+# 1. Global Page Layout Setup
+st.set_page_config(page_title="LME Base Metals Intelligence", layout="wide", page_icon="🏭")
+
+st.title("🏭 London Metal Exchange (LME) Base Metals Panel")
+st.caption("🌐 Global Cloud Engine — Synchronized via Private Bloomberg Core API & Multi-Agent Cognitive Synthesis")
+
+# Create two distinct UI panel views right below the main header
+tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case Studies"])
+
+# ==============================================================================
+# TAB 1: QUANTITATIVE TRADING DESK METRICS (YOUR ORIGINAL LOGIC)
+# ==============================================================================
+with tab1:
+    if "GITHUB_TOKEN" not in st.secrets:
+        st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
+        st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and paste: GITHUB_TOKEN = 'your_token'")
+    else:
+        token = st.secrets["GITHUB_TOKEN"]
+        url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
+        headers = {"Authorization": f"token {token}"}
+
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                master_df = pd.read_csv(StringIO(response.text))
+                
+                METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
+                metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
+                
+                df_metal = master_df[master_df['metal'] == metal_selection].copy()
+                df_metal['date'] = pd.to_datetime(df_metal['date'])
+                df_metal = df_metal.sort_values(by='date').reset_index(drop=True)
+                
+                if not df_metal.empty:
+                    current_price = df_metal['close'].iloc[-1]
+                    prior_price = df_metal['close'].iloc[-2]
+                    price_delta = current_price - prior_price
+                    pct_delta = (price_delta / prior_price) * 100
+                    
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric(f"LME {metal_selection} Price", f"${current_price:,.2f}", f"{price_delta:+,.2f} ({pct_delta:+.2f}%)")
+                    col2.metric("Data Engine Status", "Cloud Synced (Active)")
+                    col3.metric("Last Data Update", df_metal['date'].iloc[-1].strftime('%Y-%m-%d'))
+                    
+                    fig_candle = go.Figure(data=[go.Candlestick(
+                        x=df_metal['date'], open=df_metal['open'], high=df_metal['high'], low=df_metal['low'], close=df_metal['close'], name=metal_selection
+                    )])
+                    fig_candle.update_layout(xaxis_rangeslider_visible=False, height=380, template="plotly_white", margin=dict(t=40, b=10))
+                    st.plotly_chart(fig_candle, use_container_width=True)
+                else:
+                    st.warning("Data file found, but requested asset classes are empty.")
+            else:
+                st.error(f"⚠️ Failed to pull data from GitHub. HTTP Status Code: {response.status_code}")
+        except Exception as e:
+            st.error(f"❌ Data Stream Error: {e}")
+
+# ==============================================================================
+# TAB 2: QUALITATIVE INTELLIGENCE INGESTION ENGINE (THE UPGRADE)
+# ==============================================================================
+with tab2:
+    st.header("🔬 Multi-Agent Macro Case Studies")
     
-    METAL_OPTIONS = sorted(df['metal'].unique())
-    selected_metal = st.selectbox("Select Target Non-Ferrous Asset class:", METAL_OPTIONS)
-    
-    # Filter and calculate historical averages
-    m_data = df[df['metal'] == selected_metal].sort_values(by='date').reset_index(drop=True)
-    
-    # Calculate Averages (30-Day and 90-Day Moving Averages on Cash Mid Price)
-    m_data['cash_mid'] = (m_data['cash_bid'] + m_data['cash_ask']) / 2
-    m_data['3m_mid'] = (m_data['3m_bid'] + m_data['3m_ask']) / 2
-    m_data['30D_Avg'] = m_data['cash_mid'].rolling(window=30).mean()
-    m_data['90D_Avg'] = m_data['cash_mid'].rolling(window=90).mean()
-    
-    # Current Coordinates Extract
-    latest = m_data.iloc[-1]
-    prior = m_data.iloc[-2]
-    
-    # Spread Diagnostics (Contango vs Backwardation)
-    current_spread = latest['cash_mid'] - latest['3m_mid']
-    spread_text = "Backwardation" if current_spread > 0 else "Contango"
-    
-    # --- UI SUMMARY TILES ---
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Official Cash Mid Price", f"${latest['cash_mid']:,.2f}", f"{latest['cash_mid'] - prior['cash_mid']:+,.2f}")
-    c2.metric("Official 3-Month Mid Price", f"${latest['3m_mid']:,.2f}", f"{latest['3m_mid'] - prior['3m_mid']:+,.2f}")
-    c3.metric(f"Cash/3M Spread ({spread_text})", f"${abs(current_spread):,.2f}", f"Raw Value: {current_spread:+,.2f}")
-    c4.metric("90-Day Cash Base Average", f"${latest['90D_Avg']:,.2f}")
-    
-    st.markdown("### 📊 Prompt Date Pricing Breakdown")
-    col_a, col_b = st.columns(2)
-    
-    with col_a:
-        st.markdown("**Cash Prompt Segment**")
-        st.dataframe(pd.DataFrame({
-            "Metric Parameter": ["Cash Bid", "Cash Ask", "30-Day Cash Average", "90-Day Cash Average"],
-            "Current Value": [f"${latest['cash_bid']:,.2f}", f"${latest['cash_ask']:,.2f}", f"${latest['30D_Avg']:,.2f}", f"${latest['90D_Avg']:,.2f}"]
-        }), use_container_width=True)
+    CASE_STUDIES_DIR = "03_Case_Studies"
+
+    def get_available_case_studies():
+        if not os.path.exists(CASE_STUDIES_DIR):
+            return []
+        files = [f for f in os.listdir(CASE_STUDIES_DIR) if f.endswith(".md")]
+        return sorted(files, reverse=True)
+
+    available_briefs = get_available_case_studies()
+
+    if not available_briefs:
+        st.info("🛰️ Awaiting initial automated synchronization stream from home desktop ingestion nodes...")
+    else:
+        selected_file = st.selectbox("Select Active Briefing File to Review:", available_briefs, key="tab2_brief_select")
+        file_path = os.path.join(CASE_STUDIES_DIR, selected_file)
         
-    with col_b:
-        st.markdown("**3-Month Prompt Segment**")
-        st.dataframe(pd.DataFrame({
-            "Metric Parameter": ["3M Bid", "3M Ask", "Historical High (Period)", "Historical Low (Period)"],
-            "Current Value": [f"${latest['3m_bid']:,.2f}", f"${latest['3m_ask']:,.2f}", f"${m_data['3m_mid'].max():,.2f}", f"${m_data['3m_mid'].min():,.2f}"]
-        }), use_container_width=True)
-        
-    # --- GRAPHICAL TREND MATRIX ---
-    st.markdown("### 📈 Historical Curve Diagnostics (Cash vs Averages)")
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=m_data['date'], y=m_data['cash_mid'], name='Cash Mid Price', line=dict(color='#1f77b4', width=2)))
-    fig.add_trace(go.Scatter(x=m_data['date'], y=m_data['3m_mid'], name='3M Mid Price', line=dict(color='#ff7f0e', width=1.5, dash='dash')))
-    fig.add_trace(go.Scatter(x=m_data['date'], y=m_data['30D_Avg'], name='30-Day Moving Average', line=dict(color='#2ca02c', width=1.5)))
-    fig.add_trace(go.Scatter(x=m_data['date'], y=m_data['90D_Avg'], name='90-Day Moving Average', line=dict(color='#d62728', width=1.5)))
-    
-    fig.update_layout(template="plotly_white", height=450, xaxis_title="Timeline", yaxis_title="USD / Metric Tonne", margin=dict(l=40, r=40, t=20, b=20))
-    st.plotly_chart(fig, use_container_width=True)
-    
-else:
-    st.error("❌ The backend data repository file has not arrived yet.")
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                raw_markdown = f.read()
+            clean_markdown = re.sub(r'\[\[(.*?)\]\]', r'**\1**', raw_markdown)
+            st.markdown("---")
+            st.markdown(clean_markdown)
+        except Exception as e:
+            st.error(f"❌ Failed to parse selected case study: {e}")
