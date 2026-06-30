@@ -67,67 +67,7 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ Remote Data Stream Error: {e}")
 
-# --- PHASE 3: RENDER VISUALIZATION METRICS ---
-    if master_df is not None:
-        try:
-            # Hardening: Force all column names to lowercase to eliminate case mismatches
-            master_df.columns = [str(col).lower().strip() for col in master_df.columns]
-            
-            # Map columns to internal names based on what exists in the file
-            # If 'close' isn't found, check if it's stored under 'current value' or 'price'
-            col_map = {
-                'metal': 'metal' if 'metal' in master_df.columns else master_df.columns[0],
-                'date': 'date' if 'date' in master_df.columns else master_df.columns[1],
-                'close': 'close' if 'close' in master_df.columns else ('current value' if 'current value' in master_df.columns else master_df.columns[2]),
-                'open': 'open' if 'open' in master_df.columns else 'close',
-                'high': 'high' if 'high' in master_df.columns else 'close',
-                'low': 'low' if 'low' in master_df.columns else 'close'
-            }
-            
-            METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
-            metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
-            
-            # Filter rows cleanly matching your target metal selection
-            df_metal = master_df[master_df[col_map['metal']].astype(str).str.lower() == metal_selection.lower()].copy()
-            
-            df_metal[col_map['date']] = pd.to_datetime(df_metal[col_map['date']])
-            df_metal = df_metal.sort_values(by=col_map['date']).reset_index(drop=True)
-            
-            if not df_metal.empty:
-                current_price = float(df_metal[col_map['close']].iloc[-1])
-                
-                # Check if prior data rows exist for computing deltas, otherwise default to zero delta
-                if len(df_metal) > 1:
-                    prior_price = float(df_metal[col_map['close']].iloc[-2])
-                    price_delta = current_price - prior_price
-                    pct_delta = (price_delta / prior_price) * 100
-                else:
-                    price_delta, pct_delta = 0.0, 0.0
-                
-                col1, col2, col3 = st.columns(3)
-                col1.metric(f"LME {metal_selection} Price", f"${current_price:,.2f}", f"{price_delta:+,.2f} ({pct_delta:+.2f}%)" if len(df_metal) > 1 else "0.00 (0.00%)")
-                col2.metric("Data Engine Status", "Cloud Synced (Active)")
-                col3.metric("Last Data Update", df_metal[col_map['date']].iloc[-1].strftime('%Y-%m-%d'))
-                
-                # Render Candlestick components
-                fig_candle = go.Figure(data=[go.Candlestick(
-                    x=df_metal[col_map['date']], 
-                    open=df_metal[col_map['open']], 
-                    high=df_metal[col_map['high']], 
-                    low=df_metal[col_map['low']], 
-                    close=df_metal[col_map['close']], 
-                    name=metal_selection
-                )])
-                fig_candle.update_layout(xaxis_rangeslider_visible=False, height=380, template="plotly_white", margin=dict(t=40, b=10))
-                st.plotly_chart(fig_candle, use_container_width=True)
-            else:
-                st.warning(f"Data file found, but requested asset class '{metal_selection}' returned empty rows.")
-                st.caption(f"Available unique values in your file's metal column: {master_df[col_map['metal']].unique()}")
-        except Exception as render_error:
-            st.error(f"❌ Dashboard Rendering Anomaly: {render_error}")
-            st.info("Debugging Data Schema View:")
-            if master_df is not None:
-                st.dataframe(master_df.head(2))
+
 
 # ==============================================================================
 # TAB 2: QUALITATIVE INTELLIGENCE INGESTION ENGINE (THE UPGRADE)
