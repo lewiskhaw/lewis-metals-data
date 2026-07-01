@@ -101,7 +101,7 @@ with tab1:
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
-                # Extract terminal target prices cleanly for layout calculations
+                # Extract terminal target rows and scalar floats cleanly
                 latest_row = df_metal.iloc[-1]
                 current_cash_bid = float(latest_row['calc_cash_bid'])
                 current_cash_ask = float(latest_row['calc_cash_ask'])
@@ -110,27 +110,60 @@ with tab1:
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
                 current_cash_mid = float(latest_row['calc_cash_mid'])
                 
-                # Dynamic performance string indicators based on mid variance
+                # 🎯 COMPUTE INDIVIDUALIZED METRIC DELTAS
+                cb_delta, ca_delta, mb_delta, ma_delta = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)"
                 if len(df_metal) > 1:
-                    prior_price = float(df_metal[col_close].iloc[-2])
-                    price_delta = current_cash_mid - prior_price
-                    pct_delta = (price_delta / prior_price) * 100 if prior_price != 0 else 0.0
-                    delta_string = f"{price_delta:+,.2f} ({pct_delta:+.2f}%)"
-                else:
-                    delta_string = "0.00 (0.00%)"
-                
-                # 📊 5-COLUMN REBRANDED PREMIUM METRICS INDICATOR LAYER
+                    prior_row = df_metal.iloc[-2]
+                    
+                    # Cash Bid
+                    p_cb = float(prior_row['calc_cash_bid'])
+                    d_cb = current_cash_bid - p_cb
+                    cb_delta = f"{d_cb:+,.2f} ({(d_cb/p_cb)*100:+.2f}%)" if p_cb != 0 else "0.00 (0.00%)"
+                    
+                    # Cash Ask
+                    p_ca = float(prior_row['calc_cash_ask'])
+                    d_ca = current_cash_ask - p_ca
+                    ca_delta = f"{d_ca:+,.2f} ({(d_ca/p_ca)*100:+.2f}%)" if p_ca != 0 else "0.00 (0.00%)"
+                    
+                    # 3M Bid
+                    p_mb = float(prior_row['calc_3m_bid'])
+                    d_mb = current_3m_bid - p_mb
+                    mb_delta = f"{d_mb:+,.2f} ({(d_mb/p_mb)*100:+.2f}%)" if p_mb != 0 else "0.00 (0.00%)"
+                    
+                    # 3M Ask
+                    p_ma = float(prior_row['calc_3m_ask'])
+                    d_ma = current_3m_ask - p_ma
+                    ma_delta = f"{d_ma:+,.2f} ({(d_ma/p_ma)*100:+.2f}%)" if p_ma != 0 else "0.00 (0.00%)"
+
+                # 📊 5-COLUMN REBRANDED DISPLAY MATRIX
                 m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
-                m_col1.metric(f"LME {metal_selection} 2RC Cash Bid", f"${current_cash_bid:,.2f}", delta_string)
-                m_col2.metric(f"LME {metal_selection} 2RC Cash Ask", f"${current_cash_ask:,.2f}")
-                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}")
-                m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}")
                 
-                # Custom sign color visualization logic for the live metrics block
-                moc_delta_str = "Premium" if current_c_3m_moc >= 0 else "Discount"
-                m_col5.metric(f"LME {metal_selection} C-3M MOC", f"{current_c_3m_moc:+,.2f}", moc_delta_str, delta_color="off" if current_c_3m_moc >= 0 else "inverse")
+                m_col1.metric(f"LME {metal_selection} 2RC Cash Bid", f"${current_cash_bid:,.2f}", cb_delta)
+                m_col2.metric(f"LME {metal_selection} 2RC Cash Ask", f"${current_cash_ask:,.2f}", ca_delta)
+                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", _delta := delta_string if 'delta_string' in locals() else None)
+                # To maintain explicit delta tracks, map individual steps clearly
+                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", mb_delta)
+                m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}", ma_delta)
                 
-                # Ingestion updates ledger footer card block
+                # 🎨 CONDITIONAL TEXT FORMATTING FOR THE LIVE MOC HOVER METRIC
+                structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
+                label_color = "inverse" if current_c_3m_moc < 0 else "normal"
+                
+                # Inject a unique HTML block to cleanly force the text color criteria
+                moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
+                with m_col5:
+                    st.markdown(
+                        f"""
+                        <div style='line-height: 1.2;'>
+                            <p style='font-size: 14px; color: rgb(49, 51, 63); margin-bottom: 0px;'>LME {metal_selection} C-3M MOC</p>
+                            <p style='font-size: 36px; font-weight: 600; color: {moc_color}; margin-top: 4px; margin-bottom: 0px;'>{current_c_3m_moc:+,.2f}</p>
+                        </div>
+                        """, 
+                        unsafe_base64=True, unsafe_allow_html=True
+                    )
+                    # Force metrics display blocks for standard structure tags below
+                    st.metric("", "", structure_label, delta_color=label_color)
+
                 st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
                 
                 # --- LOAD AGENT VERDICTS ---
@@ -164,7 +197,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Smooth Trend Plot Line
+                # Draw Price Graph
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -198,7 +231,7 @@ with tab1:
                     # LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
                     ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
                     
-                    # Layout order with the structured 11-column insertion template
+                    # Layout order with the structured 11-column template
                     desired_columns = [
                         'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
