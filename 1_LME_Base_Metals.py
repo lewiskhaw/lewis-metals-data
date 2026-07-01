@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 import plotly.graph_objects as go
 import re
+import json
 from io import StringIO
 from datetime import datetime
 
@@ -60,40 +61,49 @@ with tab1:
 
     if master_df is not None:
         try:
-            # 🛑 DEFENSIVE KEY EXTRACTOR ENGINE: Maps column positions regardless of casing or spaces
-            raw_cols = {str(c).lower().strip().replace(" ", "_"): c for c in master_df.columns}
+            # Clean up raw columns by removing whitespace but preserve inner string symbols
+            master_df.columns = [str(c).strip() for c in master_df.columns]
             
-            # Identify essential column names via case-insensitive lookup
-            actual_date_col = next((raw_cols[k] for k in raw_cols if "date" in k), master_df.columns[0])
-            actual_metal_col = next((raw_cols[k] for k in raw_cols if "metal" in k), master_df.columns[1])
+            # Case-insensitive column normalizer map
+            norm_map = {str(c).lower().replace(" ", "_").replace(".", "_"): c for c in master_df.columns}
             
-            # Format and drop invalid dates
+            # Extract standard indexing anchors safely
+            actual_date_col = next((norm_map[k] for k in norm_map if "date" in k), master_df.columns[0])
+            actual_metal_col = next((norm_map[k] for k in norm_map if "metal" in k), master_df.columns[1])
+            
+            # Format and normalize timeline index array
             master_df[actual_date_col] = pd.to_datetime(master_df[actual_date_col], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[actual_date_col])
             
-            # Dynamic lookups for cash bid/ask keys
-            cb_key = next((raw_cols[k] for k in raw_cols if "cash_bid" in k or "px_bid" == k), None)
-            ca_key = next((raw_cols[k] for k in raw_cols if "cash_ask" in k or "px_ask" == k), None)
+            # Map Cash Pricing metrics dynamically
+            cb_raw = next((norm_map[k] for k in norm_map if "cash_bid" in k or "px_bid" == k), None)
+            ca_raw = next((norm_map[k] for k in norm_map if "cash_ask" in k or "px_ask" == k), None)
             
-            if cb_key and ca_key:
-                master_df['derived_cash_bid'] = pd.to_numeric(master_df[cb_key], errors='coerce')
-                master_df['derived_cash_ask'] = pd.to_numeric(master_df[ca_key], errors='coerce')
-                master_df['derived_cash_mid'] = (master_df['derived_cash_bid'] + master_df['derived_cash_ask']) / 2
+            if cb_raw and ca_raw:
+                master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_raw], errors='coerce')
+                master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_raw], errors='coerce')
+                master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             else:
-                # If individual keys fail, locate third positional column as price fallback
-                alt_price_col = master_df.columns[2]
-                master_df['derived_cash_mid'] = pd.to_numeric(master_df[alt_price_col], errors='coerce')
+                fallback_col = master_df.columns[2]
+                master_df['calc_cash_mid'] = pd.to_numeric(master_df[fallback_col], errors='coerce')
+                master_df['calc_cash_bid'] = master_df['calc_cash_mid']
+                master_df['calc_cash_ask'] = master_df['calc_cash_mid']
+                
+            # Map 3-Month Pricing metrics dynamically
+            mb_raw = next((norm_map[k] for k in norm_map if "3m_bid" in k or "px_bid_1" in k or "px_bid_1" in k), None)
+            ma_raw = next((norm_map[k] for k in norm_map if "3m_ask" in k or "px_ask_1" in k or "px_ask_1" in k), None)
             
-            # Dynamic lookups for 3M bid/ask keys
-            mb_key = next((raw_cols[k] for k in raw_cols if "3m_bid" in k or "px_bid.1" in k or "px_bid_1" in k), None)
-            ma_key = next((raw_cols[k] for k in raw_cols if "3m_ask" in k or "px_ask.1" in k or "px_ask_1" in k), None)
-            
-            if mb_key and ma_key:
-                master_df['derived_3m_bid'] = pd.to_numeric(master_df[mb_key], errors='coerce')
-                master_df['derived_3m_ask'] = pd.to_numeric(master_df[ma_key], errors='coerce')
-                master_df['derived_3m_mid'] = (master_df['derived_3m_bid'] + master_df['derived_3m_ask']) / 2
+            if mb_raw and ma_raw:
+                master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_raw], errors='coerce')
+                master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_raw], errors='coerce')
+                master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
+            else:
+                # Direct check if columns match exact layout keys
+                master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('3m_bid', 0.0), errors='coerce')
+                master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('3m_ask', 0.0), errors='coerce')
+                master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
-            col_close = 'derived_cash_mid'
+            col_close = 'calc_cash_mid'
             
             METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
@@ -120,7 +130,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[actual_date_col].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- TECHNICAL SIGNALS ---
+                # --- LOAD AGENT VERDICT ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -151,7 +161,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Plot Main Price Graph
+                # Plot Price Graph
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -189,8 +199,8 @@ with tab1:
                     # Target layout sequence mapping
                     desired_columns = [
                         'ui_date', 'ui_metal', 
-                        'derived_cash_bid', 'derived_cash_ask', 'derived_cash_mid', 
-                        'derived_3m_bid', 'derived_3m_ask', 'derived_3m_mid', 
+                        'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
+                        'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
                         'sma_20', 'sma_50'
                     ]
                     
@@ -200,8 +210,8 @@ with tab1:
                     # Formatting Display Headers
                     rename_map = {
                         'ui_date': 'Date', 'ui_metal': 'Metal',
-                        'derived_cash_bid': 'Cash Bid', 'derived_cash_ask': 'Cash Ask', 'derived_cash_mid': 'Cash Mid',
-                        'derived_3m_bid': '3M Bid', 'derived_3m_ask': '3M Ask', 'derived_3m_mid': '3M Mid',
+                        'calc_cash_bid': 'Cash Bid', 'calc_cash_ask': 'Cash Ask', 'calc_cash_mid': 'Cash Mid',
+                        'calc_3m_bid': '3M Bid', 'calc_3m_ask': '3M Ask', 'calc_3m_mid': '3M Mid',
                         'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
                     }
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
