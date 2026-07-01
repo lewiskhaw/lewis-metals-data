@@ -209,38 +209,28 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH EXPLICIT CHRONOLOGICAL CLIP-LOCKS
+                # 📊 FINANCIAL GRAPH ENGINE - COMPLETELY UNCONSTRAINED AUTORANGE PADDING
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
                 
-                sig_bg = "rgba(40, 167, 69, 0.15)" if agent_color == "green" else ("rgba(220, 53, 69, 0.15)" if agent_color == "red" else "rgba(108, 117, 125, 0.15)")
-                sig_border = "#28a745" if agent_color == "green" else ("#dc3545" if agent_color == "red" else "#6c7175")
+                # 🤖 DYNAMIC SIDE SUBTITLE TITLE METHOD (Prevents chart coordinate expansion issues)
+                chart_title_text = f"LME {metal_selection} Historical Trend | Outlook: <b>{agent_signal}</b> (${current_cash_mid:,.2f})"
 
-                # Track max timeline boundary dynamically to avoid text-box padding anomalies
-                max_timeline_date = df_metal[col_date].max()
-
-                fig_line.add_annotation(
-                    x=max_timeline_date, y=current_cash_mid,
-                    text=f"🤖 AGENT OUTLOOK: {agent_signal}<br>${current_cash_mid:,.2f}",
-                    showarrow=True, arrowhead=2, arrowcolor=sig_border, arrowsize=1, arrowwidth=2,
-                    ax=-90, ay=-50, bordercolor=sig_border, borderwidth=2, borderpad=6, bgcolor=sig_bg,
-                    opacity=0.95, font=dict(color="black", size=12)
-                )
-                
-                # Layout setup enforcing absolute maximum hard boundaries on the horizontal date axis
                 fig_line.update_layout(
-                    height=550, template="plotly_white", margin=dict(t=20, b=10, l=10, r=10),
+                    title=dict(text=chart_title_text, font=dict(size=14, color="black")),
+                    height=520, template="plotly_white", margin=dict(t=40, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
-                    legend=dict(orientation="h", yanchor="bottom", y=1.06, xanchor="right", x=1),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                    # Completely unconstrained double axis scale calculation settings
                     yaxis=dict(
                         autorange=True,
                         fixedrange=False
                     ),
                     xaxis=dict(
                         autorange=True,
-                        range=[df_metal[col_date].min(), max_timeline_date],  # 👈 HARD CLIPS TRACKS TO TODAY
+                        fixedrange=False,
                         rangeselector=dict(
                             buttons=list([
                                 dict(count=7, label="1W", step="day", stepmode="backward"),
@@ -260,8 +250,9 @@ with tab1:
                     )
                 )
                 
-                # Force vertical axis grid to scale completely inside bounding parameters
+                # Force dynamic auto-scale options on crop zoom intervals
                 fig_line.update_yaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
+                fig_line.update_xaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
                 
                 st.plotly_chart(fig_line, use_container_width=True)
                 
