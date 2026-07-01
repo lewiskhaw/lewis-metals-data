@@ -61,24 +61,31 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Force columns to lowercase and remove spaces
+            # Strip spaces and normalize headers to lowercase for bulletproof matching
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # Convert timeline index array cleanly
+            # Convert timeline string metrics to true chronological datetimes
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🛑 CRITICAL POSITIONAL ALIGNMENT ENGINE
-            # We map variables explicitly by their structural layout positions inside your CSV file
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df.iloc[:, 1], errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df.iloc[:, 2], errors='coerce').fillna(0.0)
+            # 🛑 LOCK ONTO EXACT STRING STRIP NAMES (Bypasses Positional Errors)
+            # 1. Extract Cash values securely using explicit text key fallbacks
+            cb_col = 'cash_bid' if 'cash_bid' in master_df.columns else ('px_bid' if 'px_bid' in master_df.columns else master_df.columns[1])
+            ca_col = 'cash_ask' if 'cash_ask' in master_df.columns else ('px_ask' if 'px_ask' in master_df.columns else master_df.columns[2])
+            
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_col], errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_col], errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df.iloc[:, 3], errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df.iloc[:, 4], errors='coerce').fillna(0.0)
+            # 2. Extract 3-Month values securely using explicit text key fallbacks
+            mb_col = '3m_bid' if '3m_bid' in master_df.columns else ('px_bid.1' if 'px_bid.1' in master_df.columns else master_df.columns[3])
+            ma_col = '3m_ask' if '3m_ask' in master_df.columns else ('px_ask.1' if 'px_ask.1' in master_df.columns else master_df.columns[4])
+            
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_col], errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_col], errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -167,7 +174,7 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN REVERSE-CHRONOLOGICAL DISPLAY LEDGER
+                # 📊 PRODUCTION 10-COLUMN DATA DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
