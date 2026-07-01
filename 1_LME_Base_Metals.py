@@ -209,13 +209,12 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 📊 FINANCIAL GRAPH ENGINE - COMPLETELY UNCONSTRAINED AUTORANGE PADDING
+                # 📊 FINANCIAL GRAPH ENGINE - REVISED AUTORANGE LOGIC
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
                 
-                # 🤖 DYNAMIC SIDE SUBTITLE TITLE METHOD (Prevents chart coordinate expansion issues)
                 chart_title_text = f"LME {metal_selection} Historical Trend | Outlook: <b>{agent_signal}</b> (${current_cash_mid:,.2f})"
 
                 fig_line.update_layout(
@@ -223,7 +222,8 @@ with tab1:
                     height=520, template="plotly_white", margin=dict(t=40, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    # Completely unconstrained double axis scale calculation settings
+                    # 🎯 uirevision forces the plot engine to recalibrate both axis frames on time zoom steps
+                    uirevision=metal_selection,
                     yaxis=dict(
                         autorange=True,
                         fixedrange=False
@@ -250,7 +250,7 @@ with tab1:
                     )
                 )
                 
-                # Force dynamic auto-scale options on crop zoom intervals
+                # Force tight clipping behavior to strip padding frames
                 fig_line.update_yaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
                 fig_line.update_xaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
                 
