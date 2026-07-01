@@ -98,243 +98,68 @@ with tab1:
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
-                # Calculate indicators globally over full database timeframe first
+                # Calculate indicators
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
-                # Extract terminal row metrics cleanly
+                # Extract terminal row metrics
                 latest_row = df_metal.iloc[-1]
                 current_cash_bid = float(latest_row['calc_cash_bid'])
                 current_cash_ask = float(latest_row['calc_cash_ask'])
                 current_3m_bid = float(latest_row['calc_3m_bid'])
                 current_3m_ask = float(latest_row['calc_3m_ask'])
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
-                current_cash_mid = float(latest_row['calc_cash_mid'])
                 max_dataset_date = df_metal[col_date].max()
                 
-                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS
-                cb_delta, ca_delta, mb_delta, ma_delta, moc_delta_str = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00"
-                moc_is_positive_change = True
-                
-                if len(df_metal) > 1:
-                    prior_row = df_metal.iloc[-2]
-                    
-                    # Cash Bid
-                    p_cb = float(prior_row['calc_cash_bid'])
-                    d_cb = current_cash_bid - p_cb
-                    cb_delta = f"{d_cb:+,.2f} ({(d_cb/p_cb)*100:+.2f}%)" if p_cb != 0 else "0.00 (0.00%)"
-                    
-                    # Cash Ask
-                    p_ca = float(prior_row['calc_cash_ask'])
-                    d_ca = current_cash_ask - p_ca
-                    ca_delta = f"{d_ca:+,.2f} ({(d_ca/p_ca)*100:+.2f}%)" if p_ca != 0 else "0.00 (0.00%)"
-                    
-                    # 3M Bid
-                    p_mb = float(prior_row['calc_3m_bid'])
-                    d_mb = current_3m_bid - p_mb
-                    mb_delta = f"{d_mb:+,.2f} ({(d_mb/p_mb)*100:+.2f}%)" if p_mb != 0 else "0.00 (0.00%)"
-                    
-                    # 3M Ask
-                    p_ma = float(prior_row['calc_3m_ask'])
-                    d_ma = current_3m_ask - p_ma
-                    ma_delta = f"{d_ma:+,.2f} ({(d_ma/p_ma)*100:+.2f}%)" if p_ma != 0 else "0.00 (0.00%)"
-
-                    # Centralized Spread Ingestion Tracking (C-3M MOC Delta)
-                    p_moc = float(prior_row['calc_c_3m_moc'])
-                    d_moc = current_c_3m_moc - p_moc
-                    moc_is_positive_change = (d_moc >= 0)
-                    pct_moc = (d_moc / abs(p_moc)) * 100 if p_moc != 0 else 0.0
-                    moc_delta_str = f"{d_moc:+,.2f} ({pct_moc:+.2f}%)"
-
-                # 📊 PRODUCTION 5-COLUMN REBRANDED DISPLAY MATRIX
+                # Metric display
                 m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
+                m_col1.metric(f"LME {metal_selection} 2RC Cash Bid", f"${current_cash_bid:,.2f}")
+                m_col2.metric(f"LME {metal_selection} 2RC Cash Ask", f"${current_cash_ask:,.2f}")
+                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}")
+                m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}")
+                m_col5.metric(f"LME {metal_selection} C-3M MOC", f"{current_c_3m_moc:+,.2f}")
                 
-                m_col1.metric(f"LME {metal_selection} 2RC Cash Bid", f"${current_cash_bid:,.2f}", cb_delta)
-                m_col2.metric(f"LME {metal_selection} 2RC Cash Ask", f"${current_cash_ask:,.2f}", ca_delta)
-                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", mb_delta)
-                m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}", ma_delta)
-                
-                # 🎨 TRADING TERMINAL CONDITION SPEC LABELS FOR MOC SPREAD
-                structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
-                moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
-                
-                delta_bg = "rgba(40, 167, 69, 0.12)" if moc_is_positive_change else "rgba(220, 53, 69, 0.12)"
-                delta_text_color = "#28a745" if moc_is_positive_change else "#dc3545"
-                delta_arrow = "↑" if moc_is_positive_change else "↓"
-
-                with m_col5:
-                    st.markdown(
-                        f"""
-                        <div style='line-height: 1.2;'>
-                            <p style='font-size: 14px; color: rgb(49, 51, 63); margin-bottom: 0px;'>LME {metal_selection} C-3M MOC</p>
-                            <p style='font-size: 36px; font-weight: 600; color: {moc_color}; margin-top: 4px; margin-bottom: 4px;'>{current_c_3m_moc:+,.2f}</p>
-                            <div style='display: inline-flex; align-items: center; background-color: {delta_bg}; color: {delta_text_color}; padding: 2px 8px; border-radius: 4px; font-size: 14px; font-weight: 500; margin-bottom: 8px;'>
-                                {delta_arrow} {moc_delta_str}
-                            </div>
-                        </div>
-                        """, 
-                        unsafe_allow_html=True
-                    )
-                    st.caption(f"📊 Structure: **{structure_label}**")
-
-                st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{max_dataset_date.strftime('%Y-%m-%d')}`")
                 st.markdown("---")
                 
-                # --- LOAD AGENT VERDICTS ---
-                agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
-                json_path = "03_Case_Studies/technical_signals.json"
-                if not os.path.exists(json_path):
-                    json_path = os.path.join("..", "03_Case_Studies", "technical_signals.json")
-                
-                signals_data = None
-                if os.path.exists(json_path):
-                    try:
-                        with open(json_path, "r", encoding="utf-8") as json_f:
-                            signals_data = json.load(json_f)
-                    except Exception: pass
-                
-                if signals_data is None and "GITHUB_TOKEN" in st.secrets:
-                    try:
-                        token = st.secrets["GITHUB_TOKEN"]
-                        headers = {"Authorization": f"token {token}"}
-                        json_url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/03_Case_Studies/technical_signals.json"
-                        json_res = requests.get(json_url, headers=headers)
-                        if json_res.status_code == 200:
-                            signals_data = json_res.json()
-                    except Exception: pass
-
-                if signals_data and metal_selection.lower() in signals_data:
-                    m_sig = signals_data[metal_selection.lower()]
-                    agent_signal = m_sig.get("signal", "HOLD")
-                    agent_reason = m_sig.get("reason", "Consolidating within structural limits.")
-                    agent_color = m_sig.get("color", "gray")
-
-                st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
-
-                # 🚀 HARD SERVER-SIDE TIMEFRAME FILTERS
-                st.write("")
-                timeframe = st.radio(
-                    "Select Chart Timeframe:",
-                    options=["1W", "1M", "YTD", "1Y", "3Y", "5Y", "10Y", "ALL"],
-                    index=1,  # Default fallback focus window to 1M
-                    horizontal=True
-                )
-
-                # Execute explicit dataset window slicing based on the choice
-                df_chart = df_metal.copy()
-                if timeframe == "1W":
-                    cutoff = max_dataset_date - timedelta(weeks=1)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "1M":
-                    cutoff = max_dataset_date - timedelta(days=30)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "YTD":
-                    cutoff = datetime(max_dataset_date.year, 1, 1)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "1Y":
-                    cutoff = max_dataset_date - timedelta(days=365)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "3Y":
-                    cutoff = max_dataset_date - timedelta(days=365 * 3)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "5Y":
-                    cutoff = max_dataset_date - timedelta(days=365 * 5)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-                elif timeframe == "10Y":
-                    cutoff = max_dataset_date - timedelta(days=365 * 10)
-                    df_chart = df_chart[df_chart[col_date] >= cutoff]
-
-                df_chart = df_chart.reset_index(drop=True)
-
-                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH EXPONENTIALLY CLAUSTROPHOBIC BINDING BOUNDS
-                fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
-                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
-                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
-                
-                chart_title_text = f"LME {metal_selection} {timeframe} Trend Tracker | Outlook: <b>{agent_signal}</b>"
-
-                # Drops missing NaN records completely for perfect bounding
-                valid_prices = df_chart[[col_close, 'sma_20', 'sma_50']].dropna()
-                if not valid_prices.empty:
-                    y_min = float(valid_prices.min().min()) * 0.99  # Clean 1% terminal floor pad
-                    y_max = float(valid_prices.max().max()) * 1.01  # Clean 1% terminal ceiling pad
-                else:
-                    y_min, y_max = None, None
-
-                fig_line.update_layout(
-                    title=dict(text=chart_title_text, font=dict(size=14, color="black")),
-                    height=520, template="plotly_white", margin=dict(t=40, b=10, l=10, r=10),
-                    xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    yaxis=dict(
-                        range=[y_min, y_max] if y_min is not None else None,
-                        autorange=False if y_min is not None else True,
-                        fixedrange=False,
-                        # 🎯 PREMIUM TEXT FORMATTING OVERRIDE: Formats values into pure Bloomberg currency numbers
-                        tickformat="$,.0f"
-                    ),
-                    xaxis=dict(
-                        range=[df_chart[col_date].min(), max_dataset_date],
-                        type="date"
-                    )
-                )
-                
-                st.plotly_chart(fig_line, use_container_width=True)
-                
-                # ==============================================================================
-                # 📊 PRODUCTION DATA DISPLAY LEDGER WITH STYLE ENGINES
-                # ==============================================================================
-                with st.expander("🔍 View Raw Ingestion Ledger Data"):
+                # --- LEDGER AND MONTHLY ANALYSIS ---
+                with st.expander("🔍 View Raw Ingestion Ledger & Monthly Averages"):
+                    # 1. Original Ledger
+                    st.markdown("### 📋 Raw Ingestion Ledger")
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
-                    
-                    # LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
                     ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
                     
-                    # Layout order with the structured 11-column template
-                    desired_columns = [
-                        'ui_date', 'metal', 
-                        'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
-                        'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
-                        'calc_c_3m_ask', 'calc_c_3m_moc', 'sma_20', 'sma_50'
-                    ]
-                    
-                    available_cols = [col for col in desired_columns if col in ledger_df.columns]
-                    ledger_df = ledger_df[available_cols]
-                    
-                    # Business Rebranding Definitions
                     rename_map = {
                         'ui_date': 'Date', 'metal': 'Metal',
                         'calc_cash_bid': '2RC Cash Bid', 'calc_cash_ask': '2RC Cash Ask', 'calc_cash_mid': '2RC Cash Mid',
                         'calc_3m_bid': '2RC 3M Bid', 'calc_3m_ask': '2RC 3M Ask', 'calc_3m_mid': '2RC 3M Mid',
                         'calc_c_3m_ask': '2RC C-3M Ask', 'calc_c_3m_moc': 'C-3M MOC', 'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
                     }
-                    current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
-                    ledger_df = ledger_df.rename(columns=current_rename)
                     
-                    # CSS STYLING ENGINE FOR CONDITIONAL COLOR MAPPING
-                    def apply_color_mapping(val):
-                        if isinstance(val, (int, float)):
-                            color = '#dc3545' if val < 0 else '#000000'
-                            return f'color: {color}; font-weight: 500;'
-                        return ''
+                    display_df = ledger_df[[c for c in rename_map.keys() if c in ledger_df.columns]].rename(columns=rename_map)
                     
-                    styled_ledger = ledger_df.style.map(apply_color_mapping, subset=['2RC C-3M Ask', 'C-3M MOC'])
-                    
-                    # Round formatting parameters for ledger cleanliness
-                    styled_ledger = styled_ledger.format({
-                        '2RC Cash Bid': '{:,.2f}', '2RC Cash Ask': '{:,.2f}', '2RC Cash Mid': '{:,.2f}',
-                        '2RC 3M Bid': '{:,.2f}', '2RC 3M Ask': '{:,.2f}', '2RC 3M Mid': '{:,.2f}',
-                        '2RC C-3M Ask': '{:,.2f}', 'C-3M MOC': '{:,.2f}', 'SMA_20': '{:,.2f}', 'SMA_50': '{:,.2f}'
-                    }, na_rep="-")
+                    styled_ledger = display_df.style.map(
+                        lambda val: f'color: {"#dc3545" if val < 0 else "#000000"}; font-weight: 500;' if isinstance(val, (int, float)) else '', 
+                        subset=['2RC C-3M Ask', 'C-3M MOC']
+                    ).format({col: "{:,.2f}" for col in display_df.columns if col not in ['Date', 'Metal']})
                     
                     st.dataframe(styled_ledger, hide_index=True, use_container_width=True)
                     
-            else:
-                st.warning("Data file successfully fetched from cloud, but requested asset class returned empty rows.")
-        except Exception as render_error:
-            st.error(f"❌ Dashboard Rendering Anomaly: {render_error}")
+                    # 2. Monthly Averages (Sorted latest on top)
+                    st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
+                    df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
+                    df_2026['Date_Obj'] = pd.to_datetime(df_2026[col_date])
+                    monthly_avg = df_2026.groupby(pd.Grouper(key='Date_Obj', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().reset_index()
+                    monthly_avg = monthly_avg.sort_values(by='Date_Obj', ascending=False)
+                    monthly_avg['Date'] = monthly_avg['Date_Obj'].dt.strftime('%B %Y')
+                    monthly_avg = monthly_avg.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
+                    
+                    st.dataframe(monthly_avg[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
+
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
+
+# TAB 2... (Keep your existing Tab 2 code)
 
 # ==============================================================================
 # TAB 2: QUALITATIVE INTELLIGENCE INGESTION ENGINE
