@@ -98,6 +98,7 @@ with tab1:
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
+                # 🎯 CRITICAL FIX: Calculate Technical Indicators on full historical global frame before date slicing
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
@@ -159,7 +160,6 @@ with tab1:
                 
                 delta_bg = "rgba(40, 167, 69, 0.12)" if moc_is_positive_change else "rgba(220, 53, 69, 0.12)"
                 delta_text_color = "#28a745" if moc_is_positive_change else "#dc3545"
-                delta_arrow = "↑" if moc_is_positive_change else "规律" # Backwards compatibility indicator fallbacks
                 delta_arrow = "↑" if moc_is_positive_change else "↓"
 
                 with m_col5:
@@ -211,7 +211,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 🚀 ADVANCED WORKSPACE CONTROL LAYER: HARD SERVER-SIDE TIMEFRAME FILTERS
+                # 🚀 HARD SERVER-SIDE TIMEFRAME FILTERS
                 st.write("")
                 timeframe = st.radio(
                     "Select Chart Timeframe:",
@@ -244,28 +244,36 @@ with tab1:
                     cutoff = max_dataset_date - timedelta(days=365 * 10)
                     df_chart = df_chart[df_chart[col_date] >= cutoff]
 
-                # Reset sequential index values to prevent rendering artifacts
                 df_chart = df_chart.reset_index(drop=True)
 
-                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH ABSOLUTE AUTORANGE CLIPPING
+                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH EXPONENTIALLY CLAUSTROPHOBIC BINDING BOUNDS
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
-                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_metal['sma_50'].loc[df_chart.index] if 'sma_50' in df_metal.columns else df_chart[col_close].rolling(50).mean(), name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
                 
                 chart_title_text = f"LME {metal_selection} {timeframe} Trend Tracker | Outlook: <b>{agent_signal}</b>"
 
-                # 🎯 FIXED LAYOUT MODULE: Dropped old native rangeselector to let Streamlit drive scaling fully
+                # 🎯 THE PERMANENT SCALING FIX: Clip price bounds precisely to the min/max rows inside this window
+                valid_prices = df_chart[[col_close, 'sma_20', 'sma_50']].dropna(how='all')
+                if not valid_prices.empty:
+                    y_min = float(valid_prices.min().min()) * 0.98  # Add 2% padding floor
+                    y_max = float(valid_prices.max().max()) * 1.02  # Add 2% padding ceiling
+                else:
+                    y_min, y_max = None, None
+
                 fig_line.update_layout(
                     title=dict(text=chart_title_text, font=dict(size=14, color="black")),
                     height=520, template="plotly_white", margin=dict(t=40, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                     yaxis=dict(
-                        autorange=True,
+                        range=[y_min, y_max] if y_min else None,
+                        autorange=False if y_min else True,
                         fixedrange=False
                     ),
                     xaxis=dict(
+                        range=[df_chart[col_date].min(), max_dataset_date],
                         type="date"
                     )
                 )
