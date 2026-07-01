@@ -60,21 +60,26 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Clean up column names completely
+            # Clean up column headers
             master_df.columns = [str(col).lower().strip() for col in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # 🛑 FORCE DAY-FIRST PARSING TO PERMANENTLY BANISH THE BUG
+            # Force dayfirst calendar indexing
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # Map pricing data arrays precisely to your work desktop export keys
+            # 🛑 UNIFIED REPO MAPPING LAYER
+            # Calculate Cash Mid Price cleanly
             if 'cash_bid' in master_df.columns and 'cash_ask' in master_df.columns:
                 master_df['cash_mid'] = (master_df['cash_bid'] + master_df['cash_ask']) / 2
             
-            if 'px_bid.1' in master_df.columns and 'px_ask.1' in master_df.columns:
+            # Calculate 3-Month Mid using '3m_bid' / '3m_ask' naming keys from office_exporter.py
+            if '3m_bid' in master_df.columns and '3m_ask' in master_df.columns:
+                master_df['3m_mid'] = (master_df['3m_bid'] + master_df['3m_ask']) / 2
+            # Fallback if historical data matches older structures
+            elif 'px_bid.1' in master_df.columns and 'px_ask.1' in master_df.columns:
                 master_df['3m_bid'] = master_df['px_bid.1']
                 master_df['3m_ask'] = master_df['px_ask.1']
                 master_df['3m_mid'] = (master_df['3m_bid'] + master_df['3m_ask']) / 2
@@ -85,8 +90,6 @@ with tab1:
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
-            
-            # Sort chronologically for line drawing layout
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
@@ -139,7 +142,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Smooth Line Graph
+                # Plot Price Graph Canvas
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -164,16 +167,16 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN DATA DISPLAY LEDGER
+                # 📊 COMPLETE 10-COLUMN DATA DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # Flip order to descending so the newest calendar date remains pinned to the top row
+                    # Flip sequence order to display newest date at top row
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # Convert timeline objects to text format safely
+                    # Clean calendar dates
                     ledger_df['formatted_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # Full 10-column tracking sequence requested
+                    # 10-column schema positioning configuration
                     desired_columns = [
                         'formatted_date', 'metal', 
                         'cash_bid', 'cash_ask', 'cash_mid', 
