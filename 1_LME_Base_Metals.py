@@ -189,8 +189,28 @@ with tab1:
                 
                 st.plotly_chart(fig_line, use_container_width=True)
                 
+                # --- REFINED INGESTION LEDGER DATA BLOCK ---
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    st.dataframe(df_metal.tail(10))
+                    # 1. Sort data so the newest entries appear at the very top
+                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
+                    
+                    # 2. Format the date column to strip out trailing 00:00:00 times
+                    ledger_df['date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
+                    
+                    # 3 & 4. Select, drop, and rearrange target columns cleanly
+                    # Keeps date first, moves metal second, drops px_bid.1 / px_ask.1
+                    desired_columns = [
+                        'date', 'metal', 'cash_bid', 'cash_ask', 
+                        'cash_mid', 'sma_20', 'sma_50'
+                    ]
+                    
+                    # Keep only the columns that actually exist in the dataframe to prevent errors
+                    available_cols = [col for col in desired_columns if col in ledger_df.columns]
+                    ledger_df = ledger_df[available_cols]
+                    
+                    # 5. Render the table cleanly on your web dashboard without index row numbers
+                    st.dataframe(ledger_df, hide_index=True, use_container_width=True)
+                    
             else:
                 st.warning(f"Data file found, but requested asset class '{metal_selection}' returned empty rows.")
         except Exception as render_error:
