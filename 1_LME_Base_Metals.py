@@ -54,13 +54,12 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Strip spaces and normalize headers
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             col_date, col_metal = 'date', 'metal'
             master_df[col_date] = pd.to_datetime(master_df[col_date], errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # Logic for calculations
+            # Calculations
             master_df['calc_cash_bid'] = pd.to_numeric(master_df['cash_bid'], errors='coerce').fillna(0.0)
             master_df['calc_cash_ask'] = pd.to_numeric(master_df['cash_ask'], errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
@@ -77,44 +76,50 @@ with tab1:
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy().sort_values(by=col_date)
             
             if not df_metal.empty:
-                # 🎯 Pre-calculate SMAs globally
                 df_metal['sma_20'] = df_metal['calc_cash_mid'].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal['calc_cash_mid'].rolling(window=50).mean()
-
-                # Metrics display... (Your existing m_col1-5 code goes here)
-                # ... [Keep your m_col1-5 metric code exactly as you had it] ...
                 
-                # --- TIME SELECTION ---
+                # Metrics Section
+                latest_row = df_metal.iloc[-1]
+                m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
+                m_col1.metric("LME Copper 2RC Cash Bid", f"${float(latest_row['calc_cash_bid']):,.2f}")
+                m_col2.metric("LME Copper 2RC Cash Ask", f"${float(latest_row['calc_cash_ask']):,.2f}")
+                m_col3.metric("LME Copper 2RC 3M Bid", f"${float(latest_row['calc_3m_bid']):,.2f}")
+                m_col4.metric("LME Copper 2RC 3M Ask", f"${float(latest_row['calc_3m_ask']):,.2f}")
+                m_col5.metric("LME Copper C-3M MOC", f"{float(latest_row['calc_c_3m_moc']):,.2f}")
+                
+                # Charting
                 timeframe = st.radio("Select Chart Timeframe:", ["1W", "1M", "YTD", "1Y", "3Y", "5Y", "10Y", "ALL"], index=1, horizontal=True)
-                max_date = df_metal[col_date].max()
+                max_d = df_metal[col_date].max()
                 
-                # Slicing
                 df_chart = df_metal.copy()
-                if timeframe == "1W": df_chart = df_chart[df_chart[col_date] >= (max_date - timedelta(weeks=1))]
-                elif timeframe == "1M": df_chart = df_chart[df_chart[col_date] >= (max_date - timedelta(days=30))]
-                elif timeframe == "YTD": df_chart = df_chart[df_chart[col_date].dt.year == max_date.year]
-                elif timeframe == "1Y": df_chart = df_chart[df_chart[col_date] >= (max_date - timedelta(days=365))]
-                # ... (add other logic)
+                if timeframe == "1W": df_chart = df_chart[df_chart[col_date] >= (max_d - timedelta(weeks=1))]
+                elif timeframe == "1M": df_chart = df_chart[df_chart[col_date] >= (max_d - timedelta(days=30))]
+                elif timeframe == "YTD": df_chart = df_chart[df_chart[col_date].dt.year == 2026]
                 
-                # 📊 CHART
+                # Tight Y-Axis Autoscaling
+                valid_data = df_chart[['calc_cash_mid', 'sma_20', 'sma_50']].dropna()
+                y_min = float(valid_data.min().min()) * 0.995 if not valid_data.empty else None
+                y_max = float(valid_data.max().max()) * 1.005 if not valid_data.empty else None
+
                 fig = go.Figure()
-                fig.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['calc_cash_mid'], name="Cash Mid Price"))
-                # Plotly autoscales if we don't fix y-axis range
-                fig.update_layout(height=500, template="plotly_white", yaxis=dict(tickformat="$,.0f"))
+                fig.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['calc_cash_mid'], name="Cash Mid"))
+                fig.update_layout(height=500, template="plotly_white", yaxis=dict(range=[y_min, y_max], tickformat="$,.0f"))
                 st.plotly_chart(fig, use_container_width=True)
 
-                # 🔍 LEDGERS
+                # Ledgers & Monthly Analysis
                 with st.expander("🔍 View Raw Ingestion Ledger & Monthly Averages"):
-                    # Existing Ledger
                     st.dataframe(df_metal.sort_values(by=col_date, ascending=False), use_container_width=True)
                     
-                    # 📈 NEW MONTHLY AVERAGES SECTION
-                    st.markdown("### 📅 Monthly Average Pricing Analysis")
-                    df_monthly = df_metal.copy()
-                    df_monthly['Date'] = pd.to_datetime(df_monthly[col_date])
-                    monthly_avg = df_monthly.groupby(pd.Grouper(key='Date', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean()
-                    monthly_avg.columns = ['Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']
-                    st.dataframe(monthly_avg.style.format("${:,.2f}"), use_container_width=True)
+                    st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
+                    df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
+                    df_2026['Date'] = pd.to_datetime(df_2026[col_date])
+                    monthly_avg = df_2026.groupby(pd.Grouper(key='Date', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().reset_index()
+                    monthly_avg['Date'] = monthly_avg['Date'].dt.strftime('%B %Y')
+                    monthly_avg = monthly_avg.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
+                    st.dataframe(monthly_avg.style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
 
         except Exception as e:
-            st.error(f"❌ Error: {e}")
+            st.error(f"❌ Dashboard Error: {e}")
+
+# TAB 2... (Keep your existing Tab 2 code)
