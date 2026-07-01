@@ -110,7 +110,7 @@ with tab1:
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
                 current_cash_mid = float(latest_row['calc_cash_mid'])
                 
-                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS (Including C-3M MOC Spread changes)
+                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS
                 cb_delta, ca_delta, mb_delta, ma_delta, moc_delta_str = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00"
                 moc_is_positive_change = True
                 
@@ -156,7 +156,6 @@ with tab1:
                 structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
                 moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
                 
-                # Dynamic color configuration matching native metrics highlighting engine
                 delta_bg = "rgba(40, 167, 69, 0.12)" if moc_is_positive_change else "rgba(220, 53, 69, 0.12)"
                 delta_text_color = "#28a745" if moc_is_positive_change else "#dc3545"
                 delta_arrow = "↑" if moc_is_positive_change else "↓"
@@ -177,6 +176,7 @@ with tab1:
                     st.caption(f"📊 Structure: **{structure_label}**")
 
                 st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
+                st.markdown("---")
                 
                 # --- LOAD AGENT VERDICTS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
