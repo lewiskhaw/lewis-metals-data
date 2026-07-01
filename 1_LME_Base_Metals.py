@@ -29,10 +29,8 @@ tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case
 with tab1:
     master_df = None
     
-    # Force remote URL streaming using app secret tokens to bypass stale local workspace cache blocks
     if "GITHUB_TOKEN" not in st.secrets:
         st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
-        st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and add your token.")
     else:
         token = st.secrets["GITHUB_TOKEN"]
         headers = {"Authorization": f"token {token}"}
@@ -40,10 +38,8 @@ with tab1:
         url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
 
         try:
-            # Append dynamic cache-busting timestamp string parameter to force fresh repository loads
             cb_url = f"{url_main}?cb={int(datetime.now().timestamp())}"
             response = requests.get(cb_url, headers=headers)
-            
             if response.status_code == 404:
                 cb_master = f"{url_master}?cb={int(datetime.now().timestamp())}"
                 response = requests.get(cb_master, headers=headers)
@@ -57,47 +53,24 @@ with tab1:
 
     if master_df is not None:
         try:
-            # 🛑 DIAGNOSTICS LAYER INSIDE: Forces raw string visibility before any code runs
-            st.warning(f"🔍 Raw Repository Headers Detected: {list(master_df.columns)}")
-
-            # Strip spaces and normalize headers to lowercase for bulletproof dictionary mapping
+            # Strip spaces and normalize headers to lowercase
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # Format raw Excel timeline items cleanly as Day-First calendar objects
+            # Format timeline entries cleanly
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🛑 VERIFIED DATABASE EXPLICIT KEY MAPPING LAYER (Bypasses Positional Layout Bugs)
-            # Find exact Cash Bid header
-            if 'cash_bid' in master_df.columns: cb_col = 'cash_bid'
-            elif 'px_bid' in master_df.columns: cb_col = 'px_bid'
-            else: cb_col = master_df.columns[1]
-
-            # Find exact Cash Ask header
-            if 'cash_ask' in master_df.columns: ca_col = 'cash_ask'
-            elif 'px_ask' in master_df.columns: ca_col = 'px_ask'
-            else: ca_col = master_df.columns[2]
-
-            # Find exact 3M Bid header
-            if '3m_bid' in master_df.columns: mb_col = '3m_bid'
-            elif 'px_bid.1' in master_df.columns: mb_col = 'px_bid.1'
-            else: mb_col = master_df.columns[3]
-
-            # Find exact 3M Ask header
-            if '3m_ask' in master_df.columns: ma_col = '3m_ask'
-            elif 'px_ask.1' in master_df.columns: ma_col = 'px_ask.1'
-            else: ma_col = master_df.columns[4]
+            # 🎯 DIRECT SCANNER MAPPING FOR ACTUAL REPOSITORY COLS
+            # Mapping the verified historical columns to your required layout spots
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('open', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('high', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_cash_mid'] = pd.to_numeric(master_df.get('close', 0.0), errors='coerce').fillna(0.0)
             
-            # Calculate metrics cleanly safely without float prim fillna exceptions
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_col], errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_col], errors='coerce').fillna(0.0)
-            master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
-            
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_col], errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_col], errors='coerce').fillna(0.0)
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('low', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('high', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -130,7 +103,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD MULTI-AGENT ADVISORY VERDICTS ---
+                # --- LOAD AGENT VERDICTS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -161,7 +134,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Smooth Trend Plot Line
+                # Plot Main Interactive Price Graph
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -191,6 +164,7 @@ with tab1:
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
+                    # Convert Datetime metrics into clean UI date text strings
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
                     desired_columns = [
