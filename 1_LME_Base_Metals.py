@@ -211,7 +211,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 🚀 ADVANCED WORKSPACE CONTROL LAYER: HARD SERVER-SIDE TIMEFRAME FILTERS
+                # 🚀 HARD SERVER-SIDE TIMEFRAME FILTERS
                 st.write("")
                 timeframe = st.radio(
                     "Select Chart Timeframe:",
@@ -254,7 +254,7 @@ with tab1:
                 
                 chart_title_text = f"LME {metal_selection} {timeframe} Trend Tracker | Outlook: <b>{agent_signal}</b>"
 
-                # 🎯 HARD BOUNDARY ENGINE SCALING CORE (Drops missing NaN records completely)
+                # Drops missing NaN records completely for perfect bounding
                 valid_prices = df_chart[[col_close, 'sma_20', 'sma_50']].dropna()
                 if not valid_prices.empty:
                     y_min = float(valid_prices.min().min()) * 0.99  # Clean 1% terminal floor pad
@@ -270,7 +270,9 @@ with tab1:
                     yaxis=dict(
                         range=[y_min, y_max] if y_min is not None else None,
                         autorange=False if y_min is not None else True,
-                        fixedrange=False
+                        fixedrange=False,
+                        # 🎯 PREMIUM TEXT FORMATTING OVERRIDE: Formats values into pure Bloomberg currency numbers
+                        tickformat="$,.0f"
                     ),
                     xaxis=dict(
                         range=[df_chart[col_date].min(), max_dataset_date],
