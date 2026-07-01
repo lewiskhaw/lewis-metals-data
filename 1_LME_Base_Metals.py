@@ -110,8 +110,10 @@ with tab1:
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
                 current_cash_mid = float(latest_row['calc_cash_mid'])
                 
-                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS
-                cb_delta, ca_delta, mb_delta, ma_delta = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)"
+                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS (Including C-3M MOC Spread changes)
+                cb_delta, ca_delta, mb_delta, ma_delta, moc_delta_str = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00"
+                moc_is_positive_change = True
+                
                 if len(df_metal) > 1:
                     prior_row = df_metal.iloc[-2]
                     
@@ -135,6 +137,13 @@ with tab1:
                     d_ma = current_3m_ask - p_ma
                     ma_delta = f"{d_ma:+,.2f} ({(d_ma/p_ma)*100:+.2f}%)" if p_ma != 0 else "0.00 (0.00%)"
 
+                    # Centralized Spread Ingestion Tracking (C-3M MOC Delta)
+                    p_moc = float(prior_row['calc_c_3m_moc'])
+                    d_moc = current_c_3m_moc - p_moc
+                    moc_is_positive_change = (d_moc >= 0)
+                    pct_moc = (d_moc / abs(p_moc)) * 100 if p_moc != 0 else 0.0
+                    moc_delta_str = f"{d_moc:+,.2f} ({pct_moc:+.2f}%)"
+
                 # 📊 PRODUCTION 5-COLUMN REBRANDED DISPLAY MATRIX
                 m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
                 
@@ -145,20 +154,27 @@ with tab1:
                 
                 # 🎨 TRADING TERMINAL CONDITION SPECIFIC LABELS FOR MOC SPREAD
                 structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
-                label_color = "inverse" if current_c_3m_moc < 0 else "normal"
                 moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
                 
+                # Dynamic color configuration matching native metrics highlighting engine
+                delta_bg = "rgba(40, 167, 69, 0.12)" if moc_is_positive_change else "rgba(220, 53, 69, 0.12)"
+                delta_text_color = "#28a745" if moc_is_positive_change else "#dc3545"
+                delta_arrow = "↑" if moc_is_positive_change else "↓"
+
                 with m_col5:
                     st.markdown(
                         f"""
                         <div style='line-height: 1.2;'>
                             <p style='font-size: 14px; color: rgb(49, 51, 63); margin-bottom: 0px;'>LME {metal_selection} C-3M MOC</p>
                             <p style='font-size: 36px; font-weight: 600; color: {moc_color}; margin-top: 4px; margin-bottom: 4px;'>{current_c_3m_moc:+,.2f}</p>
+                            <div style='display: inline-flex; align-items: center; background-color: {delta_bg}; color: {delta_text_color}; padding: 2px 8px; border-radius: 4px; font-size: 14px; font-weight: 500; margin-bottom: 8px;'>
+                                {delta_arrow} {moc_delta_str}
+                            </div>
                         </div>
                         """, 
                         unsafe_allow_html=True
                     )
-                    st.caption(f"📈 Structure: **{structure_label}**")
+                    st.caption(f"📊 Structure: **{structure_label}**")
 
                 st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
                 
