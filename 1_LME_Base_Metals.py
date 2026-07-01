@@ -38,6 +38,7 @@ with tab1:
         url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
 
         try:
+            # Append dynamic cache-busting parameter to bypass stale GitHub CDN paths
             cb_url = f"{url_main}?cb={int(datetime.now().timestamp())}"
             response = requests.get(cb_url, headers=headers)
             if response.status_code == 404:
@@ -59,18 +60,19 @@ with tab1:
             col_date = 'date'
             col_metal = 'metal'
             
-            # Format timeline entries cleanly
+            # Form chronological Datetime indices cleanly
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🎯 DIRECT SCANNER MAPPING FOR ACTUAL REPOSITORY COLS
-            # Mapping the verified historical columns to your required layout spots
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('open', 0.0), errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('high', 0.0), errors='coerce').fillna(0.0)
-            master_df['calc_cash_mid'] = pd.to_numeric(master_df.get('close', 0.0), errors='coerce').fillna(0.0)
+            # 🎯 STABLE SCHEMA EXTRACTION ENGINE (Matched to office_exporter.py)
+            # 1. Parse and process Cash prompt metrics
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('cash_bid', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('cash_ask', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('low', 0.0), errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('high', 0.0), errors='coerce').fillna(0.0)
+            # 2. Parse and process 3-Month prompt metrics
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('px_bid.1', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('px_ask.1', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -103,7 +105,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD AGENT VERDICTS ---
+                # --- LOAD AGENT BRIEFING VERDICTS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -134,7 +136,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Plot Main Interactive Price Graph
+                # Plot Price Graph
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -159,12 +161,11 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN REVERSE-CHRONOLOGICAL DISPLAY LEDGER
+                # 📊 PRODUCTION 10-COLUMN DATA DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # Convert Datetime metrics into clean UI date text strings
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
                     desired_columns = [
