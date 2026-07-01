@@ -285,23 +285,65 @@ with tab1:
                 # ==============================================================================
                 # 📊 PRODUCTION DATA DISPLAY LEDGER WITH STYLE ENGINES
                 # ==============================================================================
+                # 🔍 VIEW RAW INGESTION LEDGER & MONTHLY AVERAGES
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
+                    
+                    # 1. RENDER ORIGINAL LEDGER (Original code preserved)
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
-                    
-                    # LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
                     ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
                     
-                    # Layout order with the structured 11-column template
                     desired_columns = [
                         'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
                         'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
                         'calc_c_3m_ask', 'calc_c_3m_moc', 'sma_20', 'sma_50'
                     ]
-                    
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
+                    
+                    rename_map = {
+                        'ui_date': 'Date', 'metal': 'Metal',
+                        'calc_cash_bid': '2RC Cash Bid', 'calc_cash_ask': '2RC Cash Ask', 'calc_cash_mid': '2RC Cash Mid',
+                        'calc_3m_bid': '2RC 3M Bid', 'calc_3m_ask': '2RC 3M Ask', 'calc_3m_mid': '2RC 3M Mid',
+                        'calc_c_3m_ask': '2RC C-3M Ask', 'calc_c_3m_moc': 'C-3M MOC', 'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
+                    }
+                    ledger_df = ledger_df.rename(columns=rename_map)
+                    
+                    def apply_color_mapping(val):
+                        if isinstance(val, (int, float)):
+                            color = '#dc3545' if val < 0 else '#000000'
+                            return f'color: {color}; font-weight: 500;'
+                        return ''
+                    
+                    styled_ledger = ledger_df.style.map(apply_color_mapping, subset=['2RC C-3M Ask', 'C-3M MOC']).format({
+                        col: "{:,.2f}" for col in ledger_df.columns if col not in ['Date', 'Metal']
+                    }, na_rep="-")
+                    
+                    st.dataframe(styled_ledger, hide_index=True, use_container_width=True)
+                    
+                    # 2. NEW MONTHLY AVERAGES SECTION (Added below without affecting above)
+                    st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
+                    
+                    # Create monthly slice
+                    df_m = df_metal[df_metal[col_date].dt.year == 2026].copy()
+                    df_m['Date_Obj'] = pd.to_datetime(df_m[col_date])
+                    
+                    # Grouping
+                    monthly_avg = df_m.groupby(pd.Grouper(key='Date_Obj', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().reset_index()
+                    
+                    # Sorting latest at the top
+                    monthly_avg = monthly_avg.sort_values(by='Date_Obj', ascending=False)
+                    
+                    # Formatting
+                    monthly_avg['Date'] = monthly_avg['Date_Obj'].dt.strftime('%B %Y')
+                    monthly_avg = monthly_avg.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
+                    
+                    # Table Output
+                    st.dataframe(monthly_avg[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({
+                        "Avg 2RC Cash Ask": "${:,.2f}", 
+                        "Avg 2RC 3M Ask": "${:,.2f}"
+                    }), hide_index=True, use_container_width=True)
                     
                     # Business Rebranding Definitions
                     rename_map = {
