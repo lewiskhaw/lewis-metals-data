@@ -101,23 +101,32 @@ with tab1:
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
-                current_price = float(df_metal[col_close].iloc[-1])
+                # Extract terminal target prices cleanly for layout calculations
+                latest_row = df_metal.iloc[-1]
+                current_cash_bid = float(latest_row['calc_cash_bid'])
+                current_cash_ask = float(latest_row['calc_cash_ask'])
+                current_3m_bid = float(latest_row['calc_3m_bid'])
+                current_3m_ask = float(latest_row['calc_3m_ask'])
+                current_cash_mid = float(latest_row['calc_cash_mid'])
                 
+                # Dynamic performance string indicators based on mid variance
                 if len(df_metal) > 1:
                     prior_price = float(df_metal[col_close].iloc[-2])
-                    price_delta = current_price - prior_price
-                    if prior_price != 0:
-                        pct_delta = (price_delta / prior_price) * 100
-                        delta_string = f"{price_delta:+,.2f} ({pct_delta:+.2f}%)"
-                    else:
-                        delta_string = f"{price_delta:+,.2f} (0.00%)"
+                    price_delta = current_cash_mid - prior_price
+                    pct_delta = (price_delta / prior_price) * 100 if prior_price != 0 else 0.0
+                    delta_string = f"{price_delta:+,.2f} ({pct_delta:+.2f}%)"
                 else:
                     delta_string = "0.00 (0.00%)"
                 
-                col1, col2, col3 = st.columns(3)
-                col1.metric(f"LME {metal_selection} Cash Mid Price", f"${current_price:,.2f}", delta_string)
-                col2.metric("Data Engine Status", "Cloud Synced (Active)")
-                col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
+                # 📊 4-COLUMN PREMIUM METRICS INDICATOR LAYER
+                m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+                m_col1.metric(f"LME {metal_selection} Cash Bid Price", f"${current_cash_bid:,.2f}", delta_string)
+                m_col2.metric(f"LME {metal_selection} Cash Ask Price", f"${current_cash_ask:,.2f}")
+                m_col3.metric(f"LME {metal_selection} 3M Bid Price", f"${current_3m_bid:,.2f}")
+                m_col4.metric(f"LME {metal_selection} 3M Ask Price", f"${current_3m_ask:,.2f}")
+                
+                # Ingestion updates ledger footer card block
+                st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
                 
                 # --- LOAD AGENT VERDICTS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
@@ -150,7 +159,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Price Graph
+                # Draw Smooth Trend Plot Line
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -160,8 +169,8 @@ with tab1:
                 sig_border = "#28a745" if agent_color == "green" else ("#dc3545" if agent_color == "red" else "#6c7175")
 
                 fig_line.add_annotation(
-                    x=df_metal[col_date].iloc[-1], y=current_price,
-                    text=f"🤖 AGENT OUTLOOK: {agent_signal}<br>${current_price:,.2f}",
+                    x=df_metal[col_date].iloc[-1], y=current_cash_mid,
+                    text=f"🤖 AGENT OUTLOOK: {agent_signal}<br>${current_cash_mid:,.2f}",
                     showarrow=True, arrowhead=2, arrowcolor=sig_border, arrowsize=1, arrowwidth=2,
                     ax=-90, ay=-50, bordercolor=sig_border, borderwidth=2, borderpad=6, bgcolor=sig_bg,
                     opacity=0.95, font=dict(color="black", size=12)
@@ -181,10 +190,10 @@ with tab1:
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 💡 LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
+                    # LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
                     ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
                     
-                    # Layout order with the new structured column insertion point
+                    # Layout order with the structured 11-column insertion template
                     desired_columns = [
                         'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
@@ -195,7 +204,7 @@ with tab1:
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # Business Rebranding Definition
+                    # Business Rebranding Definitions
                     rename_map = {
                         'ui_date': 'Date', 'metal': 'Metal',
                         'calc_cash_bid': '2RC Cash Bid', 'calc_cash_ask': '2RC Cash Ask', 'calc_cash_mid': '2RC Cash Mid',
@@ -205,17 +214,16 @@ with tab1:
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
                     ledger_df = ledger_df.rename(columns=current_rename)
                     
-                    # 🎨 CSS STYLING ENGINE FOR CONDITIONAL ROW COLORS
+                    # CSS STYLING ENGINE FOR CONDITIONAL COLOR MAPPING
                     def apply_color_mapping(val):
                         if isinstance(val, (int, float)):
                             color = '#dc3545' if val < 0 else '#000000'
                             return f'color: {color}; font-weight: 500;'
                         return ''
                     
-                    # Apply styles to columns that contain directional spread changes
                     styled_ledger = ledger_df.style.map(apply_color_mapping, subset=['2RC C-3M Ask', 'C-3M MOC'])
                     
-                    # Round formatting parameters for display cleanliness
+                    # Round formatting parameters for ledger cleanliness
                     styled_ledger = styled_ledger.format({
                         '2RC Cash Bid': '{:,.2f}', '2RC Cash Ask': '{:,.2f}', '2RC Cash Mid': '{:,.2f}',
                         '2RC 3M Bid': '{:,.2f}', '2RC 3M Ask': '{:,.2f}', '2RC 3M Mid': '{:,.2f}',
