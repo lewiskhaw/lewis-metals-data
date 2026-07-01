@@ -29,7 +29,7 @@ tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case
 with tab1:
     master_df = None
     
-    # 🛑 STRUCTURAL UPGRADE: Force remote pull directly from GitHub API to bypass old local workspace file conflicts
+    # Force remote URL streaming using app secret tokens to bypass stale local workspace cache blocks
     if "GITHUB_TOKEN" not in st.secrets:
         st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
         st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and add your token.")
@@ -40,7 +40,7 @@ with tab1:
         url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
 
         try:
-            # Append a cache-busting timestamp to the URL parameters to force GitHub to serve the absolute freshest data row commit
+            # Append dynamic cache-busting timestamp string parameter to force fresh repository loads
             cb_url = f"{url_main}?cb={int(datetime.now().timestamp())}"
             response = requests.get(cb_url, headers=headers)
             
@@ -57,23 +57,28 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Standardize columns to lowercase and strip out spaces
+            # Strip spaces and normalize headers to lowercase for bulletproof dictionary mapping
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # Form chronological Datetime objects cleanly
+            # Format raw Excel timeline items cleanly as Day-First calendar objects
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🎯 DIRECT KEY EXTRACTOR (Bypasses traditional fallback errors)
+            # 🎯 STRING-LITERAL KEY EXTRACTION LAYER (Locked on image_aac09e.png structure)
+            # 1. Parse and process Cash Prompt fields
             master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('cash_bid', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('cash_ask', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('3m_bid', 0.0), errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('3m_ask', 0.0), errors='coerce').fillna(0.0)
+            # 2. Parse and process 3-Month Prompt fields (Targeting your raw px_bid.1 layout keys)
+            mb_key = 'px_bid.1' if 'px_bid.1' in master_df.columns else ('3m_bid' if '3m_bid' in master_df.columns else master_df.columns[3])
+            ma_key = 'px_ask.1' if 'px_ask.1' in master_df.columns else ('3m_ask' if '3m_ask' in master_df.columns else master_df.columns[4])
+            
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_key], errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_key], errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -106,7 +111,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD AGENT SIGNAL VERDICT ---
+                # --- LOAD MULTI-AGENT ADVISORY VERDICTS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -137,7 +142,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Plot Main Interactive Graph Layout
+                # Draw Smooth Trend Plot Line
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -162,11 +167,12 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN DISPLAY LEDGER
+                # 📊 PRODUCTION 10-COLUMN REVERSE-CHRONOLOGICAL DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
+                    # Convert Datetime variables into clean, formatted UI date text strings
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
                     desired_columns = [
