@@ -285,9 +285,50 @@ with tab1:
                 # Ledgers
                 with st.expander("🔍 View Raw Ingestion Ledger & Monthly Averages"):
                     st.markdown("### 📋 Raw Ingestion Ledger")
-                    ledger = df_metal.sort_values(by=col_date, ascending=False).copy()
-                    ledger['Date'] = ledger[col_date].dt.strftime('%Y-%m-%d')
-                    st.dataframe(ledger, hide_index=True, use_container_width=True)
+                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
+                    ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
+                    
+                    # LIVE CALCULATION: "2RC Cash Ask" minus "2RC 3M Ask"
+                    ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
+                    
+                    # Layout order with the structured 11-column template
+                    desired_columns = [
+                        'ui_date', 'metal', 
+                        'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
+                        'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
+                        'calc_c_3m_ask', 'calc_c_3m_moc', 'sma_20', 'sma_50'
+                    ]
+                    
+                    available_cols = [col for col in desired_columns if col in ledger_df.columns]
+                    ledger_df = ledger_df[available_cols]
+                    
+                    # Business Rebranding Definitions
+                    rename_map = {
+                        'ui_date': 'Date', 'metal': 'Metal',
+                        'calc_cash_bid': '2RC Cash Bid', 'calc_cash_ask': '2RC Cash Ask', 'calc_cash_mid': '2RC Cash Mid',
+                        'calc_3m_bid': '2RC 3M Bid', 'calc_3m_ask': '2RC 3M Ask', 'calc_3m_mid': '2RC 3M Mid',
+                        'calc_c_3m_ask': '2RC C-3M Ask', 'calc_c_3m_moc': 'C-3M MOC', 'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
+                    }
+                    current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
+                    ledger_df = ledger_df.rename(columns=current_rename)
+                    
+                    # CSS STYLING ENGINE FOR CONDITIONAL COLOR MAPPING
+                    def apply_color_mapping(val):
+                        if isinstance(val, (int, float)):
+                            color = '#dc3545' if val < 0 else '#000000'
+                            return f'color: {color}; font-weight: 500;'
+                        return ''
+                    
+                    styled_ledger = ledger_df.style.map(apply_color_mapping, subset=['2RC C-3M Ask', 'C-3M MOC'])
+                    
+                    # Round formatting parameters for ledger cleanliness
+                    styled_ledger = styled_ledger.format({
+                        '2RC Cash Bid': '{:,.2f}', '2RC Cash Ask': '{:,.2f}', '2RC Cash Mid': '{:,.2f}',
+                        '2RC 3M Bid': '{:,.2f}', '2RC 3M Ask': '{:,.2f}', '2RC 3M Mid': '{:,.2f}',
+                        '2RC C-3M Ask': '{:,.2f}', 'C-3M MOC': '{:,.2f}', 'SMA_20': '{:,.2f}', 'SMA_50': '{:,.2f}'
+                    }, na_rep="-")
+                    
+                    st.dataframe(styled_ledger, hide_index=True, use_container_width=True)
                     
                     st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
                     df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
