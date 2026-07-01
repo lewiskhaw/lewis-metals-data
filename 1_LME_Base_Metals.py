@@ -71,15 +71,15 @@ with tab1:
             col_date = 'date'
             col_metal = 'metal'
             
-            # 🛑 CRITICAL DATE PARSING UPGRADE: Convert strings to clean Datetime items FIRST
-            master_df[col_date] = pd.to_datetime(master_df[col_date], format='mixed', dayfirst=True)
+            # Convert strings to clean Datetime items FIRST
+            master_df[col_date] = pd.to_datetime(master_df[col_date], format='mixed')
             
-            # Calculate Cash Mid and 3-Month Mid explicitly from raw database keys
-            if 'px_bid' in master_df.columns and 'px_ask' in master_df.columns:
-                master_df['cash_bid'] = master_df['px_bid']
-                master_df['cash_ask'] = master_df['px_ask']
+            # 🛑 VERIFIED DATABASE KEY MAPPING LAYER
+            # Calculate Cash Mid Price dynamically
+            if 'cash_bid' in master_df.columns and 'cash_ask' in master_df.columns:
                 master_df['cash_mid'] = (master_df['cash_bid'] + master_df['cash_ask']) / 2
             
+            # Calculate 3-Month Mid Price from fallback keys (px_bid.1 / px_ask.1)
             if 'px_bid.1' in master_df.columns and 'px_ask.1' in master_df.columns:
                 master_df['3m_bid'] = master_df['px_bid.1']
                 master_df['3m_ask'] = master_df['px_ask.1']
@@ -93,7 +93,7 @@ with tab1:
             # Filter rows for selected metal
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
             
-            # Sort chronologically (oldest to newest) to completely fix the "sawtooth chart pattern"
+            # Sort chronologically (oldest to newest) to completely fix the sawtooth chart pattern
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
@@ -172,16 +172,16 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 🛠️ FIXED AND EXPANDED INGESTION LEDGER DATA BLOCK
+                # 🛠️ HARDENED 10-COLUMN INGESTION LEDGER DATA BLOCK
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # 1. Flip sorting back to descending so the newest calendar date hits the top row
+                    # 1. Reverse sort so the newest data point stays at the top of the grid view
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # 2. Convert timestamps into clean calendar date strings
+                    # 2. Format timestamps to clean calendar strings
                     ledger_df['formatted_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 3. Requesting exact sequence mapping including the new 3M parameters
+                    # 3. Requesting your exact custom column sequence structure
                     desired_columns = [
                         'formatted_date', 'metal', 
                         'cash_bid', 'cash_ask', 'cash_mid', 
@@ -189,11 +189,11 @@ with tab1:
                         'sma_20', 'sma_50'
                     ]
                     
-                    # Filter strictly to columns that exist in our calculated memory dataframe
+                    # Filter down safely to exactly what exists in our memory structure
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # 4. Safe UI column mapper to ensure zero length mismatch crashes
+                    # 4. Safe UI column renaming map
                     rename_map = {
                         'formatted_date': 'Date',
                         'metal': 'Metal',
@@ -209,7 +209,7 @@ with tab1:
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
                     ledger_df = ledger_df.rename(columns=current_rename)
                     
-                    # 5. Render clean data grid layout view frame
+                    # 5. Display the clean data grid frame without index numbers
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
