@@ -209,7 +209,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Price Graph
+                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH INTEGRATED TIMELINE ZOOM SELECTORS
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -226,10 +226,30 @@ with tab1:
                     opacity=0.95, font=dict(color="black", size=12)
                 )
                 
+                # Configure the layout to support financial range switches
                 fig_line.update_layout(
-                    height=500, template="plotly_white", margin=dict(t=20, b=10, l=10, r=10),
+                    height=550, template="plotly_white", margin=dict(t=20, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                    legend=dict(orientation="h", yanchor="bottom", y=1.06, xanchor="right", x=1),
+                    xaxis=dict(
+                        rangeselector=dict(
+                            buttons=list([
+                                dict(count=1, label="1D", step="day", stepmode="backward"),
+                                dict(count=7, label="1W", step="day", stepmode="backward"),
+                                dict(count=1, label="1M", step="month", stepmode="backward"),
+                                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                dict(count=1, label="1Y", step="year", stepmode="backward"),
+                                dict(count=3, label="3Y", step="year", stepmode="backward"),
+                                dict(count=5, label="5Y", step="year", stepmode="backward"),
+                                dict(count=10, label="10Y", step="year", stepmode="backward"),
+                                dict(step="all", label="ALL")
+                            ]),
+                            font=dict(size=11, color="#000000"),
+                            bgcolor="rgba(240, 242, 246, 0.85)",
+                            activecolor="#1f77b4"
+                        ),
+                        type="date"
+                    )
                 )
                 st.plotly_chart(fig_line, use_container_width=True)
                 
