@@ -61,6 +61,9 @@ with tab1:
 
     if master_df is not None:
         try:
+            # 🛑 DIAGNOSTICS LAYER: Forces raw string visibility at the top of the processing layer
+            st.warning(f"🔍 Raw Repository Headers Detected: {list(master_df.columns)}")
+
             # Strip spaces and normalize headers to lowercase for bulletproof matching
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
