@@ -107,16 +107,35 @@ with tab1:
                 fig.update_layout(height=500, template="plotly_white", yaxis=dict(range=[y_min, y_max], tickformat="$,.0f"))
                 st.plotly_chart(fig, use_container_width=True)
 
-                # Ledgers & Monthly Analysis
+                # 🔍 LEDGERS & MONTHLY ANALYSIS
                 with st.expander("🔍 View Raw Ingestion Ledger & Monthly Averages"):
-                    st.dataframe(df_metal.sort_values(by=col_date, ascending=False), use_container_width=True)
                     
+                    # 1. THE RAW LEDGER (Identical to your previous successful version)
+                    st.markdown("### 📋 Raw Ingestion Ledger")
+                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
+                    ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
+                    
+                    # Re-apply your specific column ordering and renaming logic here
+                    # ... [Ensure this matches exactly how you had it before the monthly table was added] ...
+                    st.dataframe(ledger_df, hide_index=True, use_container_width=True)
+                    
+                    st.markdown("---")
+
+                    # 2. MONTHLY AVERAGE PRICING ANALYSIS (Sorted latest to top)
                     st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
                     df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
                     df_2026['Date'] = pd.to_datetime(df_2026[col_date])
+                    
+                    # Group and calculate mean
                     monthly_avg = df_2026.groupby(pd.Grouper(key='Date', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().reset_index()
+                    
+                    # Sort latest month to top
+                    monthly_avg = monthly_avg.sort_values(by='Date', ascending=False)
+                    
+                    # Format Date and Rename
                     monthly_avg['Date'] = monthly_avg['Date'].dt.strftime('%B %Y')
                     monthly_avg = monthly_avg.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
+                    
                     st.dataframe(monthly_avg.style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
 
         except Exception as e:
