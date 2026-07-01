@@ -209,7 +209,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH INTEGRATED TIMELINE ZOOM SELECTORS
+                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH VISIBLE DATA AUTO-SCALING
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -226,12 +226,17 @@ with tab1:
                     opacity=0.95, font=dict(color="black", size=12)
                 )
                 
-                # Configure the layout to support financial range switches
+                # Layout setup ensuring dynamic y-axis recalculation on date crop
                 fig_line.update_layout(
                     height=550, template="plotly_white", margin=dict(t=20, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
                     legend=dict(orientation="h", yanchor="bottom", y=1.06, xanchor="right", x=1),
+                    yaxis=dict(
+                        autorange=True,
+                        fixedrange=False
+                    ),
                     xaxis=dict(
+                        autorange=True,
                         rangeselector=dict(
                             buttons=list([
                                 dict(count=1, label="1D", step="day", stepmode="backward"),
@@ -251,6 +256,10 @@ with tab1:
                         type="date"
                     )
                 )
+                
+                # 🎯 FORCE PLOTLY TO AUTO-SCALE Y-AXIS BASED SOLELY ON VISIBLE DATES
+                fig_line.update_yaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
+                
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
