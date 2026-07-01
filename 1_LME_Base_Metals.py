@@ -57,6 +57,9 @@ with tab1:
 
     if master_df is not None:
         try:
+            # 🛑 DIAGNOSTICS LAYER INSIDE: Forces raw string visibility before any code runs
+            st.warning(f"🔍 Raw Repository Headers Detected: {list(master_df.columns)}")
+
             # Strip spaces and normalize headers to lowercase for bulletproof dictionary mapping
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
@@ -67,18 +70,34 @@ with tab1:
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🎯 STRING-LITERAL KEY EXTRACTION LAYER (Locked on image_aac09e.png structure)
-            # 1. Parse and process Cash Prompt fields
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('cash_bid', 0.0), errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('cash_ask', 0.0), errors='coerce').fillna(0.0)
+            # 🛑 VERIFIED DATABASE EXPLICIT KEY MAPPING LAYER (Bypasses Positional Layout Bugs)
+            # Find exact Cash Bid header
+            if 'cash_bid' in master_df.columns: cb_col = 'cash_bid'
+            elif 'px_bid' in master_df.columns: cb_col = 'px_bid'
+            else: cb_col = master_df.columns[1]
+
+            # Find exact Cash Ask header
+            if 'cash_ask' in master_df.columns: ca_col = 'cash_ask'
+            elif 'px_ask' in master_df.columns: ca_col = 'px_ask'
+            else: ca_col = master_df.columns[2]
+
+            # Find exact 3M Bid header
+            if '3m_bid' in master_df.columns: mb_col = '3m_bid'
+            elif 'px_bid.1' in master_df.columns: mb_col = 'px_bid.1'
+            else: mb_col = master_df.columns[3]
+
+            # Find exact 3M Ask header
+            if '3m_ask' in master_df.columns: ma_col = '3m_ask'
+            elif 'px_ask.1' in master_df.columns: ma_col = 'px_ask.1'
+            else: ma_col = master_df.columns[4]
+            
+            # Calculate metrics cleanly safely without float prim fillna exceptions
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_col], errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_col], errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            # 2. Parse and process 3-Month Prompt fields (Targeting your raw px_bid.1 layout keys)
-            mb_key = 'px_bid.1' if 'px_bid.1' in master_df.columns else ('3m_bid' if '3m_bid' in master_df.columns else master_df.columns[3])
-            ma_key = 'px_ask.1' if 'px_ask.1' in master_df.columns else ('3m_ask' if '3m_ask' in master_df.columns else master_df.columns[4])
-            
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_key], errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_key], errors='coerce').fillna(0.0)
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_col], errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_col], errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -172,7 +191,6 @@ with tab1:
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # Convert Datetime variables into clean, formatted UI date text strings
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
                     desired_columns = [
