@@ -60,37 +60,46 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Clean up column headers
-            master_df.columns = [str(col).lower().strip() for col in master_df.columns]
+            # 🛑 DEFENSIVE KEY EXTRACTOR ENGINE: Maps column positions regardless of casing or spaces
+            raw_cols = {str(c).lower().strip().replace(" ", "_"): c for c in master_df.columns}
             
-            col_date = 'date'
-            col_metal = 'metal'
+            # Identify essential column names via case-insensitive lookup
+            actual_date_col = next((raw_cols[k] for k in raw_cols if "date" in k), master_df.columns[0])
+            actual_metal_col = next((raw_cols[k] for k in raw_cols if "metal" in k), master_df.columns[1])
             
-            # Force dayfirst calendar indexing
-            master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
-            master_df = master_df.dropna(subset=[col_date])
+            # Format and drop invalid dates
+            master_df[actual_date_col] = pd.to_datetime(master_df[actual_date_col], dayfirst=True, errors='coerce')
+            master_df = master_df.dropna(subset=[actual_date_col])
             
-            # 🛑 UNIFIED REPO MAPPING LAYER
-            # Calculate Cash Mid Price cleanly
-            if 'cash_bid' in master_df.columns and 'cash_ask' in master_df.columns:
-                master_df['cash_mid'] = (master_df['cash_bid'] + master_df['cash_ask']) / 2
+            # Dynamic lookups for cash bid/ask keys
+            cb_key = next((raw_cols[k] for k in raw_cols if "cash_bid" in k or "px_bid" == k), None)
+            ca_key = next((raw_cols[k] for k in raw_cols if "cash_ask" in k or "px_ask" == k), None)
             
-            # Calculate 3-Month Mid using '3m_bid' / '3m_ask' naming keys from office_exporter.py
-            if '3m_bid' in master_df.columns and '3m_ask' in master_df.columns:
-                master_df['3m_mid'] = (master_df['3m_bid'] + master_df['3m_ask']) / 2
-            # Fallback if historical data matches older structures
-            elif 'px_bid.1' in master_df.columns and 'px_ask.1' in master_df.columns:
-                master_df['3m_bid'] = master_df['px_bid.1']
-                master_df['3m_ask'] = master_df['px_ask.1']
-                master_df['3m_mid'] = (master_df['3m_bid'] + master_df['3m_ask']) / 2
-                
-            col_close = 'cash_mid' if 'cash_mid' in master_df.columns else master_df.columns[2]
+            if cb_key and ca_key:
+                master_df['derived_cash_bid'] = pd.to_numeric(master_df[cb_key], errors='coerce')
+                master_df['derived_cash_ask'] = pd.to_numeric(master_df[ca_key], errors='coerce')
+                master_df['derived_cash_mid'] = (master_df['derived_cash_bid'] + master_df['derived_cash_ask']) / 2
+            else:
+                # If individual keys fail, locate third positional column as price fallback
+                alt_price_col = master_df.columns[2]
+                master_df['derived_cash_mid'] = pd.to_numeric(master_df[alt_price_col], errors='coerce')
+            
+            # Dynamic lookups for 3M bid/ask keys
+            mb_key = next((raw_cols[k] for k in raw_cols if "3m_bid" in k or "px_bid.1" in k or "px_bid_1" in k), None)
+            ma_key = next((raw_cols[k] for k in raw_cols if "3m_ask" in k or "px_ask.1" in k or "px_ask_1" in k), None)
+            
+            if mb_key and ma_key:
+                master_df['derived_3m_bid'] = pd.to_numeric(master_df[mb_key], errors='coerce')
+                master_df['derived_3m_ask'] = pd.to_numeric(master_df[ma_key], errors='coerce')
+                master_df['derived_3m_mid'] = (master_df['derived_3m_bid'] + master_df['derived_3m_ask']) / 2
+
+            col_close = 'derived_cash_mid'
             
             METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
-            df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
-            df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
+            df_metal = master_df[master_df[actual_metal_col].astype(str).str.lower() == metal_selection.lower()].copy()
+            df_metal = df_metal.sort_values(by=actual_date_col, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
@@ -109,9 +118,9 @@ with tab1:
                 col1, col2, col3 = st.columns(3)
                 col1.metric(f"LME {metal_selection} Cash Mid Price", f"${current_price:,.2f}", delta_string)
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
-                col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
+                col3.metric("Last Data Update", df_metal[actual_date_col].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD AGENT VERDICT ---
+                # --- TECHNICAL SIGNALS ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -142,17 +151,17 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Plot Price Graph Canvas
+                # Plot Main Price Graph
                 fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
+                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
                 
                 sig_bg = "rgba(40, 167, 69, 0.15)" if agent_color == "green" else ("rgba(220, 53, 69, 0.15)" if agent_color == "red" else "rgba(108, 117, 125, 0.15)")
                 sig_border = "#28a745" if agent_color == "green" else ("#dc3545" if agent_color == "red" else "#6c7175")
 
                 fig_line.add_annotation(
-                    x=df_metal[col_date].iloc[-1], y=current_price,
+                    x=df_metal[actual_date_col].iloc[-1], y=current_price,
                     text=f"🤖 AGENT OUTLOOK: {agent_signal}<br>${current_price:,.2f}",
                     showarrow=True, arrowhead=2, arrowcolor=sig_border, arrowsize=1, arrowwidth=2,
                     ax=-90, ay=-50, bordercolor=sig_border, borderwidth=2, borderpad=6, bgcolor=sig_bg,
@@ -167,30 +176,32 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 COMPLETE 10-COLUMN DATA DISPLAY LEDGER
+                # 📊 PRODUCTION 10-COLUMN REVERSE-CHRONOLOGICAL DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # Flip sequence order to display newest date at top row
-                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
+                    # Reverse sort so the newest entries are displayed at the top row
+                    ledger_df = df_metal.sort_values(by=actual_date_col, ascending=False).copy()
                     
-                    # Clean calendar dates
-                    ledger_df['formatted_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
+                    # Format timeline objects into clean strings
+                    ledger_df['ui_date'] = ledger_df[actual_date_col].dt.strftime('%Y-%m-%d')
+                    ledger_df['ui_metal'] = ledger_df[actual_metal_col]
                     
-                    # 10-column schema positioning configuration
+                    # Target layout sequence mapping
                     desired_columns = [
-                        'formatted_date', 'metal', 
-                        'cash_bid', 'cash_ask', 'cash_mid', 
-                        '3m_bid', '3m_ask', '3m_mid', 
+                        'ui_date', 'ui_metal', 
+                        'derived_cash_bid', 'derived_cash_ask', 'derived_cash_mid', 
+                        'derived_3m_bid', 'derived_3m_ask', 'derived_3m_mid', 
                         'sma_20', 'sma_50'
                     ]
                     
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
+                    # Formatting Display Headers
                     rename_map = {
-                        'formatted_date': 'Date', 'metal': 'Metal',
-                        'cash_bid': 'Cash Bid', 'cash_ask': 'Cash Ask', 'cash_mid': 'Cash Mid',
-                        '3m_bid': '3M Bid', '3m_ask': '3M Ask', '3m_mid': '3M Mid',
+                        'ui_date': 'Date', 'ui_metal': 'Metal',
+                        'derived_cash_bid': 'Cash Bid', 'derived_cash_ask': 'Cash Ask', 'derived_cash_mid': 'Cash Mid',
+                        'derived_3m_bid': '3M Bid', 'derived_3m_ask': '3M Ask', 'derived_3m_mid': '3M Mid',
                         'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
                     }
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
