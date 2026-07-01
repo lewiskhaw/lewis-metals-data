@@ -331,12 +331,23 @@ with tab1:
                     st.dataframe(styled_ledger, hide_index=True, use_container_width=True)
                     
                     st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
+                    
+                    # Ensure we only use 2026 data
                     df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
                     df_2026['Date_Obj'] = pd.to_datetime(df_2026[col_date])
+                    
+                    # Group by month and calculate averages
                     monthly = df_2026.groupby(pd.Grouper(key='Date_Obj', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().sort_index(ascending=False)
+                    
+                    # Format Date
                     monthly['Date'] = monthly.index.strftime('%B %Y')
                     monthly = monthly.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
-                    st.dataframe(monthly[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
+                    
+                    # Display styled table
+                    st.dataframe(monthly[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({
+                        "Avg 2RC Cash Ask": "${:,.2f}", 
+                        "Avg 2RC 3M Ask": "${:,.2f}"
+                    }), hide_index=True, use_container_width=True)
         except Exception as e: st.error(f"❌ Error: {e}")
 
 # TAB 2... (Keep your existing Tab 2 code)
