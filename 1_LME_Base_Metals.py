@@ -194,23 +194,31 @@ with tab1:
                 
                 st.plotly_chart(fig_line, use_container_width=True)
                 
-                # --- REFINED INGESTION LEDGER DATA BLOCK ---
+               # --- REFINED INGESTION LEDGER DATA BLOCK ---
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # Sort data chronologically descending so the newest data hits the top of the grid
+                    # 1. Sort data so the newest entries appear at the very top
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # Convert timestamps into clean calendar string elements
+                    # 2. Format the date column to strip out trailing 00:00:00 times
                     ledger_df['date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # Group and slice schemas left to right
+                    # 3. Explicitly list the columns you want to see, mapped to lowercase/underscores
                     desired_columns = [
                         'date', 'metal', 'cash_bid', 'cash_ask', 
                         'cash_mid', 'sma_20', 'sma_50'
                     ]
+                    
+                    # 4. Safely filter down to your target array
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # Render table view canvas frame without index row numbers
+                    # 5. Rename columns on the fly for clean UI display headers
+                    ledger_df.columns = [
+                        'Date', 'Metal', 'Cash Bid', 'Cash Ask', 
+                        'Cash Mid', 'SMA_20', 'SMA_50'
+                    ]
+                    
+                    # 6. Render the table cleanly without index numbers
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
