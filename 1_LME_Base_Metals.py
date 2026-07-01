@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import re
 import json
 from io import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- CONFIGURATION ENGINE ---
 GITHUB_USERNAME = "lewiskhaw"
@@ -109,6 +109,7 @@ with tab1:
                 current_3m_ask = float(latest_row['calc_3m_ask'])
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
                 current_cash_mid = float(latest_row['calc_cash_mid'])
+                max_dataset_date = df_metal[col_date].max()
                 
                 # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS
                 cb_delta, ca_delta, mb_delta, ma_delta, moc_delta_str = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00"
@@ -152,12 +153,13 @@ with tab1:
                 m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", mb_delta)
                 m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}", ma_delta)
                 
-                # 🎨 TRADING TERMINAL CONDITION SPECIFIC LABELS FOR MOC SPREAD
+                # 🎨 TRADING TERMINAL CONDITION SPEC LABELS FOR MOC SPREAD
                 structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
                 moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
                 
                 delta_bg = "rgba(40, 167, 69, 0.12)" if moc_is_positive_change else "rgba(220, 53, 69, 0.12)"
                 delta_text_color = "#28a745" if moc_is_positive_change else "#dc3545"
+                delta_arrow = "↑" if moc_is_positive_change else "规律" # Backwards compatibility indicator fallbacks
                 delta_arrow = "↑" if moc_is_positive_change else "↓"
 
                 with m_col5:
@@ -175,7 +177,7 @@ with tab1:
                     )
                     st.caption(f"📊 Structure: **{structure_label}**")
 
-                st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
+                st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{max_dataset_date.strftime('%Y-%m-%d')}`")
                 st.markdown("---")
                 
                 # --- LOAD AGENT VERDICTS ---
@@ -209,50 +211,64 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 📊 FINANCIAL GRAPH ENGINE - REVISED AUTORANGE LOGIC
-                fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
-                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
-                
-                chart_title_text = f"LME {metal_selection} Historical Trend | Outlook: <b>{agent_signal}</b> (${current_cash_mid:,.2f})"
+                # 🚀 ADVANCED WORKSPACE CONTROL LAYER: HARD SERVER-SIDE TIMEFRAME FILTERS
+                st.write("")
+                timeframe = st.radio(
+                    "Select Chart Timeframe:",
+                    options=["1W", "1M", "YTD", "1Y", "3Y", "5Y", "10Y", "ALL"],
+                    index=1,  # Default fallback focus window to 1M
+                    horizontal=True
+                )
 
+                # Execute explicit dataset window slicing based on the choice
+                df_chart = df_metal.copy()
+                if timeframe == "1W":
+                    cutoff = max_dataset_date - timedelta(weeks=1)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "1M":
+                    cutoff = max_dataset_date - timedelta(days=30)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "YTD":
+                    cutoff = datetime(max_dataset_date.year, 1, 1)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "1Y":
+                    cutoff = max_dataset_date - timedelta(days=365)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "3Y":
+                    cutoff = max_dataset_date - timedelta(days=365 * 3)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "5Y":
+                    cutoff = max_dataset_date - timedelta(days=365 * 5)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+                elif timeframe == "10Y":
+                    cutoff = max_dataset_date - timedelta(days=365 * 10)
+                    df_chart = df_chart[df_chart[col_date] >= cutoff]
+
+                # Reset sequential index values to prevent rendering artifacts
+                df_chart = df_chart.reset_index(drop=True)
+
+                # 📊 HIGH-SPEC FINANCIAL GRAPH ENGINE WITH ABSOLUTE AUTORANGE CLIPPING
+                fig_line = go.Figure()
+                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
+                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_metal['sma_50'].loc[df_chart.index] if 'sma_50' in df_metal.columns else df_chart[col_close].rolling(50).mean(), name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
+                
+                chart_title_text = f"LME {metal_selection} {timeframe} Trend Tracker | Outlook: <b>{agent_signal}</b>"
+
+                # 🎯 FIXED LAYOUT MODULE: Dropped old native rangeselector to let Streamlit drive scaling fully
                 fig_line.update_layout(
                     title=dict(text=chart_title_text, font=dict(size=14, color="black")),
                     height=520, template="plotly_white", margin=dict(t=40, b=10, l=10, r=10),
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    # 🎯 uirevision forces the plot engine to recalibrate both axis frames on time zoom steps
-                    uirevision=metal_selection,
                     yaxis=dict(
                         autorange=True,
                         fixedrange=False
                     ),
                     xaxis=dict(
-                        autorange=True,
-                        fixedrange=False,
-                        rangeselector=dict(
-                            buttons=list([
-                                dict(count=7, label="1W", step="day", stepmode="backward"),
-                                dict(count=1, label="1M", step="month", stepmode="backward"),
-                                dict(count=1, label="YTD", step="year", stepmode="todate"),
-                                dict(count=1, label="1Y", step="year", stepmode="backward"),
-                                dict(count=3, label="3Y", step="year", stepmode="backward"),
-                                dict(count=5, label="5Y", step="year", stepmode="backward"),
-                                dict(count=10, label="10Y", step="year", stepmode="backward"),
-                                dict(step="all", label="ALL")
-                            ]),
-                            font=dict(size=11, color="#000000"),
-                            bgcolor="rgba(240, 242, 246, 0.85)",
-                            activecolor="#1f77b4"
-                        ),
                         type="date"
                     )
                 )
-                
-                # Force tight clipping behavior to strip padding frames
-                fig_line.update_yaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
-                fig_line.update_xaxes(autorangeoptions=dict(clipmin=True, clipmax=True))
                 
                 st.plotly_chart(fig_line, use_container_width=True)
                 
