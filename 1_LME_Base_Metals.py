@@ -101,7 +101,7 @@ with tab1:
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
-                # Extract terminal target rows and scalar floats cleanly
+                # Extract terminal row metrics cleanly
                 latest_row = df_metal.iloc[-1]
                 current_cash_bid = float(latest_row['calc_cash_bid'])
                 current_cash_ask = float(latest_row['calc_cash_ask'])
@@ -110,7 +110,7 @@ with tab1:
                 current_c_3m_moc = float(latest_row['calc_c_3m_moc'])
                 current_cash_mid = float(latest_row['calc_cash_mid'])
                 
-                # 🎯 COMPUTE INDIVIDUALIZED METRIC DELTAS
+                # 🎯 COMPUTE DYNAMIC METRIC VARIANCE DELTAS
                 cb_delta, ca_delta, mb_delta, ma_delta = "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)", "0.00 (0.00%)"
                 if len(df_metal) > 1:
                     prior_row = df_metal.iloc[-2]
@@ -135,34 +135,30 @@ with tab1:
                     d_ma = current_3m_ask - p_ma
                     ma_delta = f"{d_ma:+,.2f} ({(d_ma/p_ma)*100:+.2f}%)" if p_ma != 0 else "0.00 (0.00%)"
 
-                # 📊 5-COLUMN REBRANDED DISPLAY MATRIX
+                # 📊 PRODUCTION 5-COLUMN REBRANDED DISPLAY MATRIX
                 m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
                 
                 m_col1.metric(f"LME {metal_selection} 2RC Cash Bid", f"${current_cash_bid:,.2f}", cb_delta)
                 m_col2.metric(f"LME {metal_selection} 2RC Cash Ask", f"${current_cash_ask:,.2f}", ca_delta)
-                m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", _delta := delta_string if 'delta_string' in locals() else None)
-                # To maintain explicit delta tracks, map individual steps clearly
                 m_col3.metric(f"LME {metal_selection} 2RC 3M Bid", f"${current_3m_bid:,.2f}", mb_delta)
                 m_col4.metric(f"LME {metal_selection} 2RC 3M Ask", f"${current_3m_ask:,.2f}", ma_delta)
                 
-                # 🎨 CONDITIONAL TEXT FORMATTING FOR THE LIVE MOC HOVER METRIC
+                # 🎨 TRADING TERMINAL CONDITION SPECIFIC LABELS FOR MOC SPREAD
                 structure_label = "Contango" if current_c_3m_moc < 0 else "Backwardation"
                 label_color = "inverse" if current_c_3m_moc < 0 else "normal"
-                
-                # Inject a unique HTML block to cleanly force the text color criteria
                 moc_color = "#dc3545" if current_c_3m_moc < 0 else "#000000"
+                
                 with m_col5:
                     st.markdown(
                         f"""
                         <div style='line-height: 1.2;'>
                             <p style='font-size: 14px; color: rgb(49, 51, 63); margin-bottom: 0px;'>LME {metal_selection} C-3M MOC</p>
-                            <p style='font-size: 36px; font-weight: 600; color: {moc_color}; margin-top: 4px; margin-bottom: 0px;'>{current_c_3m_moc:+,.2f}</p>
+                            <p style='font-size: 36px; font-weight: 600; color: {moc_color}; margin-top: 4px; margin-bottom: 4px;'>{current_c_3m_moc:+,.2f}</p>
                         </div>
                         """, 
-                        unsafe_base64=True, unsafe_allow_html=True
+                        unsafe_allow_html=True
                     )
-                    # Force metrics display blocks for standard structure tags below
-                    st.metric("", "", structure_label, delta_color=label_color)
+                    st.caption(f"📈 Structure: **{structure_label}**")
 
                 st.markdown(f"**Data Engine Status:** `Cloud Synced (Active)` &nbsp;|&nbsp; **Last Data Update:** `{latest_row[col_date].strftime('%Y-%m-%d')}`")
                 
