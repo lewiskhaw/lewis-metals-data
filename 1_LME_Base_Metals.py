@@ -194,31 +194,40 @@ with tab1:
                 
                 st.plotly_chart(fig_line, use_container_width=True)
                 
-               # --- REFINED INGESTION LEDGER DATA BLOCK ---
+              # --- BULLETPROOF REFINED INGESTION LEDGER DATA BLOCK ---
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # 1. Sort data so the newest entries appear at the very top
+                    # 1. Sort data chronologically descending (newest entries at the top)
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
                     # 2. Format the date column to strip out trailing 00:00:00 times
                     ledger_df['date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 3. Explicitly list the columns you want to see, mapped to lowercase/underscores
+                    # 3. List your ideal columns in order of preference
                     desired_columns = [
                         'date', 'metal', 'cash_bid', 'cash_ask', 
                         'cash_mid', 'sma_20', 'sma_50'
                     ]
                     
-                    # 4. Safely filter down to your target array
+                    # 4. Filter strictly down to columns that actually exist in the file
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # 5. Rename columns on the fly for clean UI display headers
-                    ledger_df.columns = [
-                        'Date', 'Metal', 'Cash Bid', 'Cash Ask', 
-                        'Cash Mid', 'SMA_20', 'SMA_50'
-                    ]
+                    # 5. DYNAMIC MAPPING: Rename headers safely without triggering length mismatch bugs
+                    rename_map = {
+                        'date': 'Date',
+                        'metal': 'Metal',
+                        'cash_bid': 'Cash Bid',
+                        'cash_ask': 'Cash Ask',
+                        'cash_mid': 'Cash Mid',
+                        'sma_20': 'SMA_20',
+                        'sma_50': 'SMA_50'
+                    }
                     
-                    # 6. Render the table cleanly without index numbers
+                    # Apply renaming map only to the columns that exist
+                    current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
+                    ledger_df = ledger_df.rename(columns=current_rename)
+                    
+                    # 6. Render the data table cleanly without row index numbers
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
