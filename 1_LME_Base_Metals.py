@@ -12,7 +12,6 @@ GITHUB_USERNAME = "lewiskhaw"
 GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
 
-# Global date variable initialization to secure regex fallbacks
 today_str = datetime.today().strftime('%Y-%m-%d')
 
 # 1. Global Page Layout Setup
@@ -21,16 +20,14 @@ st.set_page_config(page_title="LME Base Metals Intelligence", layout="wide", pag
 st.title("🏭 London Metal Exchange (LME) Base Metals Panel")
 st.caption("🌐 Global Cloud Engine — Synchronized via Private Bloomberg Core API & Multi-Agent Cognitive Synthesis")
 
-# Create two distinct UI panel views right below the main header
 tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case Studies"])
 
 # ==============================================================================
-# TAB 1: QUANTITATIVE TRADING DESK METRICS (YOUR RESTORED LOGIC)
+# TAB 1: QUANTITATIVE TRADING DESK METRICS
 # ==============================================================================
 with tab1:
     master_df = None
     
-    # --- PHASE 1: PREFER LOCAL WORKSPACE LOAD ---
     local_csv_path = "lme_master_data.csv"
     if not os.path.exists(local_csv_path):
         local_csv_path = os.path.join("..", "lme_master_data.csv")
@@ -41,7 +38,6 @@ with tab1:
         except Exception as e:
             st.warning(f"Failed to read local workspace CSV, attempting remote fallback: {e}")
 
-    # --- PHASE 2: REMOTE URL FALLBACK ---
     if master_df is None:
         if "GITHUB_TOKEN" not in st.secrets:
             st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
@@ -62,24 +58,22 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ Remote Data Stream Error: {e}")
 
-    # --- PHASE 3: RENDER VISUALIZATION METRICS ---
     if master_df is not None:
         try:
-            # Force columns to lowercase and remove trailing spaces
+            # Clean up column names completely
             master_df.columns = [str(col).lower().strip() for col in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # Convert strings to clean Datetime items FIRST
-            master_df[col_date] = pd.to_datetime(master_df[col_date], format='mixed')
+            # 🛑 FORCE DAY-FIRST PARSING TO PERMANENTLY BANISH THE BUG
+            master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
+            master_df = master_df.dropna(subset=[col_date])
             
-            # 🛑 VERIFIED DATABASE KEY MAPPING LAYER
-            # Calculate Cash Mid Price dynamically
+            # Map pricing data arrays precisely to your work desktop export keys
             if 'cash_bid' in master_df.columns and 'cash_ask' in master_df.columns:
                 master_df['cash_mid'] = (master_df['cash_bid'] + master_df['cash_ask']) / 2
             
-            # Calculate 3-Month Mid Price from fallback keys (px_bid.1 / px_ask.1)
             if 'px_bid.1' in master_df.columns and 'px_ask.1' in master_df.columns:
                 master_df['3m_bid'] = master_df['px_bid.1']
                 master_df['3m_ask'] = master_df['px_ask.1']
@@ -90,14 +84,12 @@ with tab1:
             METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
-            # Filter rows for selected metal
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
             
-            # Sort chronologically (oldest to newest) to completely fix the sawtooth chart pattern
+            # Sort chronologically for line drawing layout
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
-                # Calculate Technical Moving Average Indicators
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
@@ -116,7 +108,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD TECHNICAL SIGNALS ---
+                # --- LOAD AGENT VERDICT ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -147,7 +139,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Build Main Line Chart
+                # Draw Smooth Line Graph
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -172,16 +164,16 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 🛠️ HARDENED 10-COLUMN INGESTION LEDGER DATA BLOCK
+                # 📊 PRODUCTION 10-COLUMN DATA DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # 1. Reverse sort so the newest data point stays at the top of the grid view
+                    # Flip order to descending so the newest calendar date remains pinned to the top row
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # 2. Format timestamps to clean calendar strings
+                    # Convert timeline objects to text format safely
                     ledger_df['formatted_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 3. Requesting your exact custom column sequence structure
+                    # Full 10-column tracking sequence requested
                     desired_columns = [
                         'formatted_date', 'metal', 
                         'cash_bid', 'cash_ask', 'cash_mid', 
@@ -189,27 +181,18 @@ with tab1:
                         'sma_20', 'sma_50'
                     ]
                     
-                    # Filter down safely to exactly what exists in our memory structure
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # 4. Safe UI column renaming map
                     rename_map = {
-                        'formatted_date': 'Date',
-                        'metal': 'Metal',
-                        'cash_bid': 'Cash Bid',
-                        'cash_ask': 'Cash Ask',
-                        'cash_mid': 'Cash Mid',
-                        '3m_bid': '3M Bid',
-                        '3m_ask': '3M Ask',
-                        '3m_mid': '3M Mid',
-                        'sma_20': 'SMA_20',
-                        'sma_50': 'SMA_50'
+                        'formatted_date': 'Date', 'metal': 'Metal',
+                        'cash_bid': 'Cash Bid', 'cash_ask': 'Cash Ask', 'cash_mid': 'Cash Mid',
+                        '3m_bid': '3M Bid', '3m_ask': '3M Ask', '3m_mid': '3M Mid',
+                        'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
                     }
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
                     ledger_df = ledger_df.rename(columns=current_rename)
                     
-                    # 5. Display the clean data grid frame without index numbers
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
