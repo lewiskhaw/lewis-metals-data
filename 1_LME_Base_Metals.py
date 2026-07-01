@@ -8,7 +8,7 @@ import json
 from io import StringIO
 from datetime import datetime
 
-# --- CONFIGURATION MATCHING YOUR REPO ---
+# --- CONFIGURATION ENGINE ---
 GITHUB_USERNAME = "lewiskhaw"
 GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
@@ -29,79 +29,51 @@ tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case
 with tab1:
     master_df = None
     
-    local_csv_path = "lme_master_data.csv"
-    if not os.path.exists(local_csv_path):
-        local_csv_path = os.path.join("..", "lme_master_data.csv")
-        
-    if os.path.exists(local_csv_path):
+    # 🛑 STRUCTURAL UPGRADE: Force remote pull directly from GitHub API to bypass old local workspace file conflicts
+    if "GITHUB_TOKEN" not in st.secrets:
+        st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
+        st.info("Please go to your Streamlit Cloud Dashboard -> App Settings -> Secrets, and add your token.")
+    else:
+        token = st.secrets["GITHUB_TOKEN"]
+        headers = {"Authorization": f"token {token}"}
+        url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
+        url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
+
         try:
-            master_df = pd.read_csv(local_csv_path)
+            # Append a cache-busting timestamp to the URL parameters to force GitHub to serve the absolute freshest data row commit
+            cb_url = f"{url_main}?cb={int(datetime.now().timestamp())}"
+            response = requests.get(cb_url, headers=headers)
+            
+            if response.status_code == 404:
+                cb_master = f"{url_master}?cb={int(datetime.now().timestamp())}"
+                response = requests.get(cb_master, headers=headers)
+                
+            if response.status_code == 200:
+                master_df = pd.read_csv(StringIO(response.text))
+            else:
+                st.error(f"⚠️ Failed to pull live data matrix from GitHub. Status Code: {response.status_code}")
         except Exception as e:
-            st.warning(f"Failed to read local workspace CSV, attempting remote fallback: {e}")
-
-    if master_df is None:
-        if "GITHUB_TOKEN" not in st.secrets:
-            st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
-        else:
-            token = st.secrets["GITHUB_TOKEN"]
-            headers = {"Authorization": f"token {token}"}
-            url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
-            url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
-
-            try:
-                response = requests.get(url_main, headers=headers)
-                if response.status_code == 404:
-                    response = requests.get(url_master, headers=headers)
-                if response.status_code == 200:
-                    master_df = pd.read_csv(StringIO(response.text))
-                else:
-                    st.error(f"⚠️ Failed to pull data from GitHub. HTTP Status Code: {response.status_code}")
-            except Exception as e:
-                st.error(f"❌ Remote Data Stream Error: {e}")
+            st.error(f"❌ Remote Data Stream Connection Error: {e}")
 
     if master_df is not None:
         try:
-            # 🛑 DIAGNOSTICS LAYER: Forces raw string visibility at the top of the processing layer
-            st.warning(f"🔍 Raw Repository Headers Detected: {list(master_df.columns)}")
-
-            # Strip spaces and normalize headers to lowercase for bulletproof matching
+            # Standardize columns to lowercase and strip out spaces
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
             col_date = 'date'
             col_metal = 'metal'
             
-            # Convert timeline string metrics to true chronological datetimes
+            # Form chronological Datetime objects cleanly
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🛑 VERIFIED DATABASE EXPLICIT KEY MAPPING LAYER (Bypasses Positional Layout Bugs)
-            # Find exact Cash Bid header
-            if 'cash_bid' in master_df.columns: cb_col = 'cash_bid'
-            elif 'px_bid' in master_df.columns: cb_col = 'px_bid'
-            else: cb_col = master_df.columns[1]
-
-            # Find exact Cash Ask header
-            if 'cash_ask' in master_df.columns: ca_col = 'cash_ask'
-            elif 'px_ask' in master_df.columns: ca_col = 'px_ask'
-            else: ca_col = master_df.columns[2]
-
-            # Find exact 3M Bid header
-            if '3m_bid' in master_df.columns: mb_col = '3m_bid'
-            elif 'px_bid.1' in master_df.columns: mb_col = 'px_bid.1'
-            else: mb_col = master_df.columns[3]
-
-            # Find exact 3M Ask header
-            if '3m_ask' in master_df.columns: ma_col = '3m_ask'
-            elif 'px_ask.1' in master_df.columns: ma_col = 'px_ask.1'
-            else: ma_col = master_df.columns[4]
-            
-            # Calculate metrics cleanly
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_col], errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_col], errors='coerce').fillna(0.0)
+            # 🎯 DIRECT KEY EXTRACTOR (Bypasses traditional fallback errors)
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df.get('cash_bid', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df.get('cash_ask', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_col], errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_col], errors='coerce').fillna(0.0)
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('3m_bid', 0.0), errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('3m_ask', 0.0), errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
@@ -134,7 +106,7 @@ with tab1:
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
                 col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
-                # --- LOAD AGENT VERDICT ---
+                # --- LOAD AGENT SIGNAL VERDICT ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
                 json_path = "03_Case_Studies/technical_signals.json"
                 if not os.path.exists(json_path):
@@ -165,7 +137,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Plot Price Graph
+                # Plot Main Interactive Graph Layout
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -190,7 +162,7 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN DATA DISPLAY LEDGER
+                # 📊 PRODUCTION 10-COLUMN DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
@@ -219,7 +191,7 @@ with tab1:
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
-                st.warning(f"Data file found, but requested asset class '{metal_selection}' returned empty rows.")
+                st.warning("Data file successfully fetched from cloud, but requested asset class returned empty rows.")
         except Exception as render_error:
             st.error(f"❌ Dashboard Rendering Anomaly: {render_error}")
 
