@@ -87,7 +87,10 @@ with tab1:
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
-            df_metal[col_date] = pd.to_datetime(df_metal[col_date])
+            
+            # 🛑 MIXED DATE FORMAT PATCH INTEGRATED HERE
+            df_metal[col_date] = pd.to_datetime(df_metal[col_date], format='mixed')
+            
             df_metal = df_metal.sort_values(by=col_date).reset_index(drop=True)
             
             if not df_metal.empty:
@@ -198,7 +201,6 @@ with tab1:
                     ledger_df['date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
                     # 3 & 4. Select, drop, and rearrange target columns cleanly
-                    # Keeps date first, moves metal second, drops px_bid.1 / px_ask.1
                     desired_columns = [
                         'date', 'metal', 'cash_bid', 'cash_ask', 
                         'cash_mid', 'sma_20', 'sma_50'
