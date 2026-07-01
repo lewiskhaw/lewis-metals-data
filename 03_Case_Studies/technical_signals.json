@@ -1,62 +1,62 @@
 {
     "copper": {
-        "date": "2026-07-01",
-        "price": 10013.0,
-        "sma_20": 9851.5,
-        "sma_50": 9596.5,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 9690.0,
+        "sma_20": 9212.3,
+        "sma_50": 9444.18,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     },
     "aluminium": {
-        "date": "2026-07-01",
-        "price": 2591.6,
-        "sma_20": 2549.8,
-        "sma_50": 2483.8,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 2508.0,
+        "sma_20": 2384.36,
+        "sma_50": 2444.38,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     },
     "tin": {
-        "date": "2026-07-01",
-        "price": 30628.0,
-        "sma_20": 30134.0,
-        "sma_50": 29354.0,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 29640.0,
+        "sma_20": 28178.8,
+        "sma_50": 28888.08,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     },
     "nickel": {
-        "date": "2026-07-01",
-        "price": 20026.0,
-        "sma_20": 19703.0,
-        "sma_50": 19193.0,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 19380.0,
+        "sma_20": 18424.6,
+        "sma_50": 18888.36,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     },
     "lead": {
-        "date": "2026-07-01",
-        "price": 2473.8,
-        "sma_20": 2433.9,
-        "sma_50": 2370.9,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 2394.0,
+        "sma_20": 2275.98,
+        "sma_50": 2333.27,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     },
     "zinc": {
-        "date": "2026-07-01",
-        "price": 2827.2,
-        "sma_20": 2781.6,
-        "sma_50": 2709.6,
-        "rsi": 100.0,
-        "signal": "SELL FLAG",
-        "reason": "Death Cross structural breakdown triggered alongside overbought RSI distribution.",
-        "color": "red"
+        "date": "2026-12-06",
+        "price": 2736.0,
+        "sma_20": 2601.12,
+        "sma_50": 2666.59,
+        "rsi": 55.96,
+        "signal": "HOLD",
+        "reason": "Consolidating within structural historical standard deviations.",
+        "color": "gray"
     }
 }
