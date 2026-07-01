@@ -61,55 +61,33 @@ with tab1:
 
     if master_df is not None:
         try:
-            # Clean up raw columns by removing whitespace but preserve inner string symbols
-            master_df.columns = [str(c).strip() for c in master_df.columns]
+            # Force columns to lowercase and remove spaces
+            master_df.columns = [str(c).lower().strip() for c in master_df.columns]
             
-            # Case-insensitive column normalizer map
-            norm_map = {str(c).lower().replace(" ", "_").replace(".", "_"): c for c in master_df.columns}
+            col_date = 'date'
+            col_metal = 'metal'
             
-            # Extract standard indexing anchors safely
-            actual_date_col = next((norm_map[k] for k in norm_map if "date" in k), master_df.columns[0])
-            actual_metal_col = next((norm_map[k] for k in norm_map if "metal" in k), master_df.columns[1])
+            # Convert timeline index array cleanly
+            master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
+            master_df = master_df.dropna(subset=[col_date])
             
-            # Format and normalize timeline index array
-            master_df[actual_date_col] = pd.to_datetime(master_df[actual_date_col], dayfirst=True, errors='coerce')
-            master_df = master_df.dropna(subset=[actual_date_col])
+            # 🛑 CRITICAL POSITIONAL ALIGNMENT ENGINE
+            # We map variables explicitly by their structural layout positions inside your CSV file
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df.iloc[:, 1], errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df.iloc[:, 2], errors='coerce').fillna(0.0)
+            master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
-            # Map Cash Pricing metrics dynamically
-            cb_raw = next((norm_map[k] for k in norm_map if "cash_bid" in k or "px_bid" == k), None)
-            ca_raw = next((norm_map[k] for k in norm_map if "cash_ask" in k or "px_ask" == k), None)
-            
-            if cb_raw and ca_raw:
-                master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_raw], errors='coerce')
-                master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_raw], errors='coerce')
-                master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
-            else:
-                fallback_col = master_df.columns[2]
-                master_df['calc_cash_mid'] = pd.to_numeric(master_df[fallback_col], errors='coerce')
-                master_df['calc_cash_bid'] = master_df['calc_cash_mid']
-                master_df['calc_cash_ask'] = master_df['calc_cash_mid']
-                
-            # Map 3-Month Pricing metrics dynamically
-            mb_raw = next((norm_map[k] for k in norm_map if "3m_bid" in k or "px_bid_1" in k or "px_bid_1" in k), None)
-            ma_raw = next((norm_map[k] for k in norm_map if "3m_ask" in k or "px_ask_1" in k or "px_ask_1" in k), None)
-            
-            if mb_raw and ma_raw:
-                master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_raw], errors='coerce')
-                master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_raw], errors='coerce')
-                master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
-            else:
-                # Direct check if columns match exact layout keys
-                master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('3m_bid', 0.0), errors='coerce')
-                master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('3m_ask', 0.0), errors='coerce')
-                master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df.iloc[:, 3], errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df.iloc[:, 4], errors='coerce').fillna(0.0)
+            master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
 
             col_close = 'calc_cash_mid'
             
             METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
-            df_metal = master_df[master_df[actual_metal_col].astype(str).str.lower() == metal_selection.lower()].copy()
-            df_metal = df_metal.sort_values(by=actual_date_col, ascending=True).reset_index(drop=True)
+            df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
+            df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
@@ -117,7 +95,6 @@ with tab1:
 
                 current_price = float(df_metal[col_close].iloc[-1])
                 
-                # 🛑 DEFENSIVE UPGRADE: Hardened against float division by zero errors
                 if len(df_metal) > 1:
                     prior_price = float(df_metal[col_close].iloc[-2])
                     price_delta = current_price - prior_price
@@ -132,7 +109,7 @@ with tab1:
                 col1, col2, col3 = st.columns(3)
                 col1.metric(f"LME {metal_selection} Cash Mid Price", f"${current_price:,.2f}", delta_string)
                 col2.metric("Data Engine Status", "Cloud Synced (Active)")
-                col3.metric("Last Data Update", df_metal[actual_date_col].iloc[-1].strftime('%Y-%m-%d'))
+                col3.metric("Last Data Update", df_metal[col_date].iloc[-1].strftime('%Y-%m-%d'))
                 
                 # --- LOAD AGENT VERDICT ---
                 agent_signal, agent_reason, agent_color = "HOLD", "No active signal generated.", "gray"
@@ -167,15 +144,15 @@ with tab1:
 
                 # Plot Price Graph
                 fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
-                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
-                fig_line.add_trace(go.Scatter(x=df_metal[actual_date_col], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
+                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
+                fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_50'], name="50 DMA Overlay", line=dict(color="#d62728", width=1.2, dash='dot')))
                 
                 sig_bg = "rgba(40, 167, 69, 0.15)" if agent_color == "green" else ("rgba(220, 53, 69, 0.15)" if agent_color == "red" else "rgba(108, 117, 125, 0.15)")
                 sig_border = "#28a745" if agent_color == "green" else ("#dc3545" if agent_color == "red" else "#6c7175")
 
                 fig_line.add_annotation(
-                    x=df_metal[actual_date_col].iloc[-1], y=current_price,
+                    x=df_metal[col_date].iloc[-1], y=current_price,
                     text=f"🤖 AGENT OUTLOOK: {agent_signal}<br>${current_price:,.2f}",
                     showarrow=True, arrowhead=2, arrowcolor=sig_border, arrowsize=1, arrowwidth=2,
                     ax=-90, ay=-50, bordercolor=sig_border, borderwidth=2, borderpad=6, bgcolor=sig_bg,
@@ -190,19 +167,15 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 INGESTION LEDGER DATA BLOCK
+                # 📊 PRODUCTION 10-COLUMN REVERSE-CHRONOLOGICAL DISPLAY LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # Reverse sort so the newest entries are displayed at the top row
-                    ledger_df = df_metal.sort_values(by=actual_date_col, ascending=False).copy()
+                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # Format timeline objects into clean strings
-                    ledger_df['ui_date'] = ledger_df[actual_date_col].dt.strftime('%Y-%m-%d')
-                    ledger_df['ui_metal'] = ledger_df[actual_metal_col]
+                    ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # Target layout sequence mapping
                     desired_columns = [
-                        'ui_date', 'ui_metal', 
+                        'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
                         'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
                         'sma_20', 'sma_50'
@@ -211,9 +184,8 @@ with tab1:
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # Formatting Display Headers
                     rename_map = {
-                        'ui_date': 'Date', 'ui_metal': 'Metal',
+                        'ui_date': 'Date', 'metal': 'Metal',
                         'calc_cash_bid': 'Cash Bid', 'calc_cash_ask': 'Cash Ask', 'calc_cash_mid': 'Cash Mid',
                         'calc_3m_bid': '3M Bid', 'calc_3m_ask': '3M Ask', 'calc_3m_mid': '3M Mid',
                         'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
