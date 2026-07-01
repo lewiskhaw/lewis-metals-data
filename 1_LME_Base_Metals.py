@@ -60,21 +60,25 @@ with tab1:
             col_date = 'date'
             col_metal = 'metal'
             
-            # 🛑 SMART PARSING FIX: Removed dayfirst=True to align with your script's MM/DD/YYYY format
             master_df[col_date] = pd.to_datetime(master_df[col_date], errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🎯 DIRECT DATA MAPPING LAYER
+            # 🎯 HARDENED ALIGNMENT LAYER
+            # 1. Parse Cash prompt metrics
             master_df['calc_cash_bid'] = pd.to_numeric(master_df['cash_bid'] if 'cash_bid' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
             master_df['calc_cash_ask'] = pd.to_numeric(master_df['cash_ask'] if 'cash_ask' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
             
+            # 2. Parse 3-Month prompt metrics
             mb_key = 'px_bid.1' if 'px_bid.1' in master_df.columns else ('3m_bid' if '3m_bid' in master_df.columns else master_df.columns[3])
             ma_key = 'px_ask.1' if 'px_ask.1' in master_df.columns else ('3m_ask' if '3m_ask' in master_df.columns else master_df.columns[4])
             
             master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_key] if mb_key in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
             master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_key] if ma_key in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
+            
+            # 3. Parse Injected C-3M MOC Column
+            master_df['calc_c_3m_moc'] = pd.to_numeric(master_df['c_3m_moc'] if 'c_3m_moc' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
 
             col_close = 'calc_cash_mid'
             
@@ -137,7 +141,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # Draw Smooth Trend Line Plot
+                # Draw Smooth Trend Plot Line
                 fig_line = go.Figure()
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal[col_close], name="Cash Mid Price", line=dict(color="#1f77b4", width=2)))
                 fig_line.add_trace(go.Scatter(x=df_metal[col_date], y=df_metal['sma_20'], name="20 DMA Overlay", line=dict(color="#2ca02c", width=1.2, dash='dot')))
@@ -162,17 +166,18 @@ with tab1:
                 st.plotly_chart(fig_line, use_container_width=True)
                 
                 # ==============================================================================
-                # 📊 PRODUCTION 10-COLUMN LEDGER
+                # 📊 PRODUCTION 11-COLUMN EXPANDED VIEW LEDGER
                 # ==============================================================================
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
+                    # 🛑 Positioned 'calc_c_3m_moc' right between 3M Mid and SMA_20
                     desired_columns = [
                         'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
                         'calc_3m_bid', 'calc_3m_ask', 'calc_3m_mid', 
-                        'sma_20', 'sma_50'
+                        'calc_c_3m_moc', 'sma_20', 'sma_50'
                     ]
                     
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
@@ -182,7 +187,7 @@ with tab1:
                         'ui_date': 'Date', 'metal': 'Metal',
                         'calc_cash_bid': 'Cash Bid', 'calc_cash_ask': 'Cash Ask', 'calc_cash_mid': 'Cash Mid',
                         'calc_3m_bid': '3M Bid', 'calc_3m_ask': '3M Ask', 'calc_3m_mid': '3M Mid',
-                        'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
+                        'calc_c_3m_moc': 'C-3M MOC', 'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
                     }
                     current_rename = {k: v for k, v in rename_map.items() if k in ledger_df.columns}
                     ledger_df = ledger_df.rename(columns=current_rename)
