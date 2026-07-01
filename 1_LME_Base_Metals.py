@@ -77,8 +77,18 @@ with tab1:
             master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_key] if ma_key in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
             master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
             
-            # 3. Parse Injected C-3M MOC Column
-            master_df['calc_c_3m_moc'] = pd.to_numeric(master_df['c_3m_moc'] if 'c_3m_moc' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
+            # 3. Aggressive Lookups for C-3M MOC (Handles underscores, dots, or stripped keys seamlessly)
+            moc_key = None
+            for candidate in ['c_3m_moc', 'c-3m moc', 'c-3m_moc', 'c_3m_moc.1', 'px_last.1']:
+                if candidate in master_df.columns:
+                    moc_key = candidate
+                    break
+            
+            if moc_key:
+                master_df['calc_c_3m_moc'] = pd.to_numeric(master_df[moc_key], errors='coerce').fillna(0.0)
+            else:
+                # Direct safe extraction if the key layout maps to an explicit position fallback
+                master_df['calc_c_3m_moc'] = pd.to_numeric(master_df.iloc[:, 5] if len(master_df.columns) > 5 else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
 
             col_close = 'calc_cash_mid'
             
@@ -172,7 +182,6 @@ with tab1:
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 🛑 Positioned 'calc_c_3m_moc' right between 3M Mid and SMA_20
                     desired_columns = [
                         'ui_date', 'metal', 
                         'calc_cash_bid', 'calc_cash_ask', 'calc_cash_mid', 
