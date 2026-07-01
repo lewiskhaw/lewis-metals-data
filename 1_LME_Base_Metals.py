@@ -98,7 +98,7 @@ with tab1:
             df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
-                # 🎯 CRITICAL FIX: Calculate Technical Indicators on full historical global frame before date slicing
+                # Calculate indicators globally over full database timeframe first
                 df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
                 df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
 
@@ -211,7 +211,7 @@ with tab1:
 
                 st.info(f"🧠 **Technical Charting Agent Verdict:** `{agent_signal}` — {agent_reason}")
 
-                # 🚀 HARD SERVER-SIDE TIMEFRAME FILTERS
+                # 🚀 ADVANCED WORKSPACE CONTROL LAYER: HARD SERVER-SIDE TIMEFRAME FILTERS
                 st.write("")
                 timeframe = st.radio(
                     "Select Chart Timeframe:",
@@ -254,11 +254,11 @@ with tab1:
                 
                 chart_title_text = f"LME {metal_selection} {timeframe} Trend Tracker | Outlook: <b>{agent_signal}</b>"
 
-                # 🎯 THE PERMANENT SCALING FIX: Clip price bounds precisely to the min/max rows inside this window
-                valid_prices = df_chart[[col_close, 'sma_20', 'sma_50']].dropna(how='all')
+                # 🎯 HARD BOUNDARY ENGINE SCALING CORE (Drops missing NaN records completely)
+                valid_prices = df_chart[[col_close, 'sma_20', 'sma_50']].dropna()
                 if not valid_prices.empty:
-                    y_min = float(valid_prices.min().min()) * 0.98  # Add 2% padding floor
-                    y_max = float(valid_prices.max().max()) * 1.02  # Add 2% padding ceiling
+                    y_min = float(valid_prices.min().min()) * 0.99  # Clean 1% terminal floor pad
+                    y_max = float(valid_prices.max().max()) * 1.01  # Clean 1% terminal ceiling pad
                 else:
                     y_min, y_max = None, None
 
@@ -268,8 +268,8 @@ with tab1:
                     xaxis_title="Timeline", yaxis_title="USD / Metric Tonne",
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                     yaxis=dict(
-                        range=[y_min, y_max] if y_min else None,
-                        autorange=False if y_min else True,
+                        range=[y_min, y_max] if y_min is not None else None,
+                        autorange=False if y_min is not None else True,
                         fixedrange=False
                     ),
                     xaxis=dict(
