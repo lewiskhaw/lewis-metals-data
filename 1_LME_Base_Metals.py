@@ -86,12 +86,14 @@ with tab1:
             METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
             metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
             
+            # Filter explicitly down to the selected target metal asset rows
             df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
             
-            # 🛑 MIXED DATE FORMAT PATCH INTEGRATED HERE
+            # Map regional datetime variations cleanly using mixed inference engines
             df_metal[col_date] = pd.to_datetime(df_metal[col_date], format='mixed')
             
-            df_metal = df_metal.sort_values(by=col_date).reset_index(drop=True)
+            # 🛑 CHART FIX: Force oldest-to-newest sorting to eliminate the sawtooth line pattern
+            df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
             
             if not df_metal.empty:
                 # --- CALCULATION OF LIVE OVERLAYS FOR THE WEB DASHBOARD ---
@@ -194,23 +196,21 @@ with tab1:
                 
                 # --- REFINED INGESTION LEDGER DATA BLOCK ---
                 with st.expander("🔍 View Raw Ingestion Ledger Data"):
-                    # 1. Sort data so the newest entries appear at the very top
+                    # Sort data chronologically descending so the newest data hits the top of the grid
                     ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
                     
-                    # 2. Format the date column to strip out trailing 00:00:00 times
+                    # Convert timestamps into clean calendar string elements
                     ledger_df['date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
                     
-                    # 3 & 4. Select, drop, and rearrange target columns cleanly
+                    # Group and slice schemas left to right
                     desired_columns = [
                         'date', 'metal', 'cash_bid', 'cash_ask', 
                         'cash_mid', 'sma_20', 'sma_50'
                     ]
-                    
-                    # Keep only the columns that actually exist in the dataframe to prevent errors
                     available_cols = [col for col in desired_columns if col in ledger_df.columns]
                     ledger_df = ledger_df[available_cols]
                     
-                    # 5. Render the table cleanly on your web dashboard without index row numbers
+                    # Render table view canvas frame without index row numbers
                     st.dataframe(ledger_df, hide_index=True, use_container_width=True)
                     
             else:
