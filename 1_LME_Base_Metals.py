@@ -71,18 +71,31 @@ with tab1:
             master_df[col_date] = pd.to_datetime(master_df[col_date], dayfirst=True, errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🛑 LOCK ONTO EXACT STRING STRIP NAMES (Bypasses Positional Errors)
-            # 1. Extract Cash values securely using explicit text key fallbacks
-            cb_col = 'cash_bid' if 'cash_bid' in master_df.columns else ('px_bid' if 'px_bid' in master_df.columns else master_df.columns[1])
-            ca_col = 'cash_ask' if 'cash_ask' in master_df.columns else ('px_ask' if 'px_ask' in master_df.columns else master_df.columns[2])
+            # 🛑 VERIFIED DATABASE EXPLICIT KEY MAPPING LAYER (Bypasses Positional Layout Bugs)
+            # Find exact Cash Bid header
+            if 'cash_bid' in master_df.columns: cb_col = 'cash_bid'
+            elif 'px_bid' in master_df.columns: cb_col = 'px_bid'
+            else: cb_col = master_df.columns[1]
+
+            # Find exact Cash Ask header
+            if 'cash_ask' in master_df.columns: ca_col = 'cash_ask'
+            elif 'px_ask' in master_df.columns: ca_col = 'px_ask'
+            else: ca_col = master_df.columns[2]
+
+            # Find exact 3M Bid header
+            if '3m_bid' in master_df.columns: mb_col = '3m_bid'
+            elif 'px_bid.1' in master_df.columns: mb_col = 'px_bid.1'
+            else: mb_col = master_df.columns[3]
+
+            # Find exact 3M Ask header
+            if '3m_ask' in master_df.columns: ma_col = '3m_ask'
+            elif 'px_ask.1' in master_df.columns: ma_col = 'px_ask.1'
+            else: ma_col = master_df.columns[4]
             
+            # Calculate metrics cleanly
             master_df['calc_cash_bid'] = pd.to_numeric(master_df[cb_col], errors='coerce').fillna(0.0)
             master_df['calc_cash_ask'] = pd.to_numeric(master_df[ca_col], errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
-            
-            # 2. Extract 3-Month values securely using explicit text key fallbacks
-            mb_col = '3m_bid' if '3m_bid' in master_df.columns else ('px_bid.1' if 'px_bid.1' in master_df.columns else master_df.columns[3])
-            ma_col = '3m_ask' if '3m_ask' in master_df.columns else ('px_ask.1' if 'px_ask.1' in master_df.columns else master_df.columns[4])
             
             master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_col], errors='coerce').fillna(0.0)
             master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_col], errors='coerce').fillna(0.0)
