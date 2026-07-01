@@ -13,148 +13,89 @@ GITHUB_USERNAME = "lewiskhaw"
 GITHUB_REPO = "lewis-metals-data"
 FILE_PATH = "lme_master_data.csv"
 
-today_str = datetime.today().strftime('%Y-%m-%d')
-
 # 1. Global Page Layout Setup
 st.set_page_config(page_title="LME Base Metals Intelligence", layout="wide", page_icon="🏭")
-
 st.title("🏭 London Metal Exchange (LME) Base Metals Panel")
 st.caption("🌐 Global Cloud Engine — Synchronized via Private Bloomberg Core API & Multi-Agent Cognitive Synthesis")
 
 tab1, tab2 = st.tabs(["📊 Live LME Metrics & Charts", "📂 Autonomous AI Case Studies"])
 
-# ==============================================================================
-# TAB 1: QUANTITATIVE TRADING DESK METRICS
-# ==============================================================================
 with tab1:
     master_df = None
-    
     if "GITHUB_TOKEN" not in st.secrets:
-        st.error("⚠️ GITHUB_TOKEN is missing from your Streamlit App Secrets.")
+        st.error("⚠️ GITHUB_TOKEN is missing.")
     else:
         token = st.secrets["GITHUB_TOKEN"]
         headers = {"Authorization": f"token {token}"}
-        url_main = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}"
-        url_master = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/master/{FILE_PATH}"
-
+        url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{GITHUB_REPO}/main/{FILE_PATH}?cb={int(datetime.now().timestamp())}"
         try:
-            cb_url = f"{url_main}?cb={int(datetime.now().timestamp())}"
-            response = requests.get(cb_url, headers=headers)
-            
-            if response.status_code == 404:
-                cb_master = f"{url_master}?cb={int(datetime.now().timestamp())}"
-                response = requests.get(cb_master, headers=headers)
-                
-            if response.status_code == 200:
-                master_df = pd.read_csv(StringIO(response.text))
-            else:
-                st.error(f"⚠️ Failed to pull live data matrix from GitHub. Status Code: {response.status_code}")
+            res = requests.get(url, headers=headers)
+            if res.status_code == 200:
+                master_df = pd.read_csv(StringIO(res.text))
         except Exception as e:
-            st.error(f"❌ Remote Data Stream Connection Error: {e}")
+            st.error(f"❌ Connection Error: {e}")
 
     if master_df is not None:
         try:
-            # Strip spaces and normalize headers to lowercase
             master_df.columns = [str(c).lower().strip() for c in master_df.columns]
-            
-            col_date = 'date'
-            col_metal = 'metal'
-            
+            col_date, col_metal = 'date', 'metal'
             master_df[col_date] = pd.to_datetime(master_df[col_date], errors='coerce')
             master_df = master_df.dropna(subset=[col_date])
             
-            # 🎯 HARDENED ALIGNMENT LAYER
-            # 1. Parse Cash prompt metrics
-            master_df['calc_cash_bid'] = pd.to_numeric(master_df['cash_bid'] if 'cash_bid' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
-            master_df['calc_cash_ask'] = pd.to_numeric(master_df['cash_ask'] if 'cash_ask' in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
+            # Calculations
+            master_df['calc_cash_bid'] = pd.to_numeric(master_df['cash_bid'], errors='coerce').fillna(0.0)
+            master_df['calc_cash_ask'] = pd.to_numeric(master_df['cash_ask'], errors='coerce').fillna(0.0)
             master_df['calc_cash_mid'] = (master_df['calc_cash_bid'] + master_df['calc_cash_ask']) / 2
-            
-            # 2. Parse 3-Month prompt metrics
-            mb_key = 'px_bid.1' if 'px_bid.1' in master_df.columns else ('3m_bid' if '3m_bid' in master_df.columns else master_df.columns[3])
-            ma_key = 'px_ask.1' if 'px_ask.1' in master_df.columns else ('3m_ask' if '3m_ask' in master_df.columns else master_df.columns[4])
-            
-            master_df['calc_3m_bid'] = pd.to_numeric(master_df[mb_key] if mb_key in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
-            master_df['calc_3m_ask'] = pd.to_numeric(master_df[ma_key] if ma_key in master_df.columns else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
-            master_df['calc_3m_mid'] = (master_df['calc_3m_bid'] + master_df['calc_3m_ask']) / 2
-            
-            # 3. Parse Injected C-3M MOC Column
-            moc_key = None
-            for candidate in ['c_3m_moc', 'c-3m moc', 'c-3m_moc', 'c_3m_moc.1', 'px_last.1']:
-                if candidate in master_df.columns:
-                    moc_key = candidate
-                    break
-            
-            if moc_key:
-                master_df['calc_c_3m_moc'] = pd.to_numeric(master_df[moc_key], errors='coerce').fillna(0.0)
-            else:
-                master_df['calc_c_3m_moc'] = pd.to_numeric(master_df.iloc[:, 5] if len(master_df.columns) > 5 else pd.Series([0.0]*len(master_df)), errors='coerce').fillna(0.0)
+            master_df['calc_3m_bid'] = pd.to_numeric(master_df.get('px_bid.1', master_df.get('3m_bid', 0.0)), errors='coerce').fillna(0.0)
+            master_df['calc_3m_ask'] = pd.to_numeric(master_df.get('px_ask.1', master_df.get('3m_ask', 0.0)), errors='coerce').fillna(0.0)
+            master_df['calc_c_3m_moc'] = pd.to_numeric(master_df.get('c_3m_moc', master_df.get('px_last.1', 0.0)), errors='coerce').fillna(0.0)
 
-            col_close = 'calc_cash_mid'
-            
-            METAL_OPTIONS = ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"]
-            metal_selection = st.selectbox("Select Target Base Metal to Analyze", METAL_OPTIONS, key="tab1_metal_select")
-            
-            df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy()
-            df_metal = df_metal.sort_values(by=col_date, ascending=True).reset_index(drop=True)
+            metal_selection = st.selectbox("Select Target Base Metal to Analyze", ["Copper", "Aluminium", "Tin", "Nickel", "Lead", "Zinc"])
+            df_metal = master_df[master_df[col_metal].astype(str).str.lower() == metal_selection.lower()].copy().sort_values(by=col_date)
             
             if not df_metal.empty:
-                # Calculate indicators globally
-                df_metal['sma_20'] = df_metal[col_close].rolling(window=20).mean()
-                df_metal['sma_50'] = df_metal[col_close].rolling(window=50).mean()
-
-                # Extract latest row metrics
-                latest_row = df_metal.iloc[-1]
-                max_dataset_date = df_metal[col_date].max()
+                latest = df_metal.iloc[-1]
+                prior = df_metal.iloc[-2] if len(df_metal) > 1 else latest
                 
-                # Metric display
+                # Metrics with Delta
                 m_cols = st.columns(5)
-                m_cols[0].metric("Cash Bid", f"${float(latest_row['calc_cash_bid']):,.2f}")
-                m_cols[1].metric("Cash Ask", f"${float(latest_row['calc_cash_ask']):,.2f}")
-                m_cols[2].metric("3M Bid", f"${float(latest_row['calc_3m_bid']):,.2f}")
-                m_cols[3].metric("3M Ask", f"${float(latest_row['calc_3m_ask']):,.2f}")
-                m_cols[4].metric("C-3M MOC", f"{float(latest_row['calc_c_3m_moc']):,.2f}")
+                for i, key in enumerate(['calc_cash_bid', 'calc_cash_ask', 'calc_3m_bid', 'calc_3m_ask']):
+                    delta = float(latest[key]) - float(prior[key])
+                    m_cols[i].metric(f"LME {metal_selection} 2RC {key.replace('calc_', '').replace('_', ' ').upper()}", f"${float(latest[key]):,.2f}", f"{delta:,.2f}")
+                
+                moc_delta = float(latest['calc_c_3m_moc']) - float(prior['calc_c_3m_moc'])
+                m_cols[4].metric(f"LME {metal_selection} C-3M MOC", f"{float(latest['calc_c_3m_moc']):,.2f}", f"{moc_delta:,.2f}")
                 
                 st.markdown("---")
                 
-                # Charting logic
+                # Charting
                 timeframe = st.radio("Select Chart Timeframe:", ["1W", "1M", "YTD", "1Y", "3Y", "5Y", "10Y", "ALL"], index=1, horizontal=True)
+                max_d = df_metal[col_date].max()
                 df_chart = df_metal.copy()
-                if timeframe == "1W": df_chart = df_chart[df_chart[col_date] >= (max_dataset_date - timedelta(weeks=1))]
-                elif timeframe == "1M": df_chart = df_chart[df_chart[col_date] >= (max_dataset_date - timedelta(days=30))]
+                if timeframe == "1W": df_chart = df_chart[df_chart[col_date] >= (max_d - timedelta(weeks=1))]
+                elif timeframe == "1M": df_chart = df_chart[df_chart[col_date] >= (max_d - timedelta(days=30))]
                 elif timeframe == "YTD": df_chart = df_chart[df_chart[col_date].dt.year == 2026]
-                elif timeframe == "1Y": df_chart = df_chart[df_chart[col_date] >= (max_dataset_date - timedelta(days=365))]
-                # ... other timeframes ...
                 
-                fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart[col_close], name="Cash Mid Price"))
-                fig_line.update_layout(height=500, template="plotly_white", yaxis=dict(tickformat="$,.0f"))
-                st.plotly_chart(fig_line, use_container_width=True)
+                valid = df_chart[['calc_cash_mid']].dropna()
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df_chart[col_date], y=df_chart['calc_cash_mid'], name="Cash Mid"))
+                fig.update_layout(height=400, template="plotly_white", yaxis=dict(range=[valid.min().min()*0.99, valid.max().max()*1.01], tickformat="$,.0f"))
+                st.plotly_chart(fig, use_container_width=True)
 
-                # 🔍 LEDGERS
+                # Ledgers
                 with st.expander("🔍 View Raw Ingestion Ledger & Monthly Averages"):
                     st.markdown("### 📋 Raw Ingestion Ledger")
-                    ledger_df = df_metal.sort_values(by=col_date, ascending=False).copy()
-                    ledger_df['ui_date'] = ledger_df[col_date].dt.strftime('%Y-%m-%d')
-                    ledger_df['calc_c_3m_ask'] = ledger_df['calc_cash_ask'] - ledger_df['calc_3m_ask']
-                    
-                    rename_map = {
-                        'ui_date': 'Date', 'metal': 'Metal',
-                        'calc_cash_bid': '2RC Cash Bid', 'calc_cash_ask': '2RC Cash Ask', 'calc_cash_mid': '2RC Cash Mid',
-                        'calc_3m_bid': '2RC 3M Bid', 'calc_3m_ask': '2RC 3M Ask', 'calc_3m_mid': '2RC 3M Mid',
-                        'calc_c_3m_ask': '2RC C-3M Ask', 'calc_c_3m_moc': 'C-3M MOC', 'sma_20': 'SMA_20', 'sma_50': 'SMA_50'
-                    }
-                    display_df = ledger_df[[c for c in rename_map.keys() if c in ledger_df.columns]].rename(columns=rename_map)
-                    st.dataframe(display_df, hide_index=True, use_container_width=True)
+                    ledger = df_metal.sort_values(by=col_date, ascending=False).copy()
+                    ledger['Date'] = ledger[col_date].dt.strftime('%Y-%m-%d')
+                    st.dataframe(ledger, hide_index=True, use_container_width=True)
                     
                     st.markdown("### 📅 Monthly Average Pricing Analysis (2026)")
                     df_2026 = df_metal[df_metal[col_date].dt.year == 2026].copy()
                     df_2026['Date_Obj'] = pd.to_datetime(df_2026[col_date])
-                    monthly_avg = df_2026.groupby(pd.Grouper(key='Date_Obj', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().reset_index()
-                    monthly_avg = monthly_avg.sort_values(by='Date_Obj', ascending=False)
-                    monthly_avg['Date'] = monthly_avg['Date_Obj'].dt.strftime('%B %Y')
-                    monthly_avg = monthly_avg.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
-                    st.dataframe(monthly_avg[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
-
+                    monthly = df_2026.groupby(pd.Grouper(key='Date_Obj', freq='ME'))[['calc_cash_ask', 'calc_3m_ask']].mean().sort_index(ascending=False)
+                    monthly['Date'] = monthly.index.strftime('%B %Y')
+                    monthly = monthly.rename(columns={'calc_cash_ask': 'Avg 2RC Cash Ask', 'calc_3m_ask': 'Avg 2RC 3M Ask'})
+                    st.dataframe(monthly[['Date', 'Avg 2RC Cash Ask', 'Avg 2RC 3M Ask']].style.format({"Avg 2RC Cash Ask": "${:,.2f}", "Avg 2RC 3M Ask": "${:,.2f}"}), hide_index=True, use_container_width=True)
         except Exception as e: st.error(f"❌ Error: {e}")
 
 # TAB 2... (Keep your existing Tab 2 code)
