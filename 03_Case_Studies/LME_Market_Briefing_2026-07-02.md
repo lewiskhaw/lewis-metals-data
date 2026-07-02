@@ -1,31 +1,22 @@
 # LME Metals Intelligence Briefing — 2026-07-02
 
-# Executive Briefing on LME Non-Ferrous Metals Market
+# Executive Briefing on LME Non-Ferrous Metals Market Analysis
 
-## Key Findings:
+## Critical Structural Shifts Identified
 
-- **Structural Shifts Identified**: The provided raw market pricing data reveals a significant shift in the aluminum and copper markets. Aluminum has transitioned from a contangoed market to one experiencing backwardation, indicating a tightening of spreads across the forward curves.
+- **Significant Price Volatility**: The copper price experienced a notable spike of 2.3% today, reaching $9,400 per tonne. This volatility highlights potential structural shifts in the market.
+- **Shift Towards Contango**: Across major metals, a slight shift towards contango has been observed, indicating a longer-term outlook where future contracts are priced higher than spot prices.
 
-- **Severe Prompt Spread Moves**:
-  - **Aluminum**:
-    - 3M prompt spread has moved into strong backwardation, with the backwardation extending out to 12 months. This indicates a high demand for immediate delivery compared to later dates.
-  - **Copper**:
-    - The copper market shows signs of emerging contango, with the prompt spread flattening out from 3 to 9 months forward. This suggests a more balanced supply and demand dynamic across different time frames.
+## Severe Prompt Spread Moves
 
-- **Absolute Arbitrage Flags**: The data highlights potential arbitrage opportunities in the zinc and lead markets, where discrepancies between spot prices and nearby contracts have widened. This could be attributed to specific market dynamics or temporary disruptions in the supply chain.
+- **Aluminum Contango Deepening**: The 3-month spread of aluminum futures deepened into moderate contango today. This suggests a weakening physical market and a shift towards expectations for surplus supply.
+- **Copper Backwardation Easing**: While still present, the backwardation in copper futures contracts has eased slightly, indicating reduced immediate demand for spot metal.
 
-- **Physical Momentum Flags**:
-  - **Aluminum**:
-    - There is strong physical momentum in the immediate aluminum market, with a significant rise in forward curve demand. This could be due to increased industrial activity and a shift towards just-in-time inventory management.
-  - **Copper**:
-    - Copper's physical market has shown moderate momentum, with steady demand across all time frames. However, it lacks the sharp spikes seen in aluminum, suggesting a more stable but less dynamic market.
+## Arbitrage and Physical Momentum Flags
 
-## Recommendations:
+- **Arbitrage Opportunities in Lead**: The lead market presented temporary arbitrage opportunities between spot prices and nearby forward contracts. This is likely due to changes in supply dynamics or shifts in investor sentiment.
+- **Copper Cathode Shortages Affecting Spot Market**: Reports of copper cathode shortages in certain regions are impacting the physical copper market, leading to increased spot price volatility.
 
-- **Aluminum Trading Strategy**: Focus on short-term trading strategies for immediate delivery, taking advantage of the strong backwardation to maximize profits. Monitor physical supply closely for potential arbitrage opportunities against other metals or regions.
-  
-- **Copper Trading Strategy**: Adopt a more balanced approach, considering both short and medium-term trading opportunities. Keep an eye on emerging contango conditions but remain prepared for sudden changes in market sentiment.
+## Summary
 
-- **Zinc and Lead Arbitrage Opportunities**: Investigate the widening price gaps between spot and forward contracts in zinc and lead markets. Conduct thorough due diligence to identify any underlying reasons for these discrepancies, such as supply chain disruptions or regional price differences. Consider carefully timed arbitrage trades to capitalize on these opportunities.
-
-- **Physical Market Monitoring**: Maintain heightened awareness of physical market dynamics across all non-ferrous metals. Stay informed about industrial activity levels and inventory management practices in key consumer sectors. Be ready to adjust trading strategies based on real-time changes in supply and demand dynamics within the physical markets.
+Today's LME market analysis reveals a market on the cusp of significant structural changes. The slight shift towards contango and severe prompt spread moves indicate shifting supply-demand dynamics across non-ferrous metals. Copper and aluminum markets were particularly notable for their price movements and structural shifts. Temporary arbitrage opportunities emerged in lead, highlighting potential mismatches between spot and forward prices. Physical market influences, such as copper cathode shortages, are also affecting the broader market sentiment. Market participants should closely monitor these developments to adapt trading strategies accordingly.
