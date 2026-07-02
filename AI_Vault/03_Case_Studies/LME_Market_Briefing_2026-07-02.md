@@ -1,35 +1,31 @@
 # LME Metals Intelligence Briefing — 2026-07-02
 
-# Executive Briefing: LME Non-Ferrous Metals Market Analysis
+# Executive Briefing on LME Non-Ferrous Metals Market
 
-## Critical Structural Shifts Identified
+## Key Findings:
 
-- **Aluminum:** Significant tightening in the cash-wire vs 3M spread, indicating a shift towards backwardation. This suggests increased near-term demand and potential arbitrage opportunities for physical aluminum.
+- **Structural Shifts Identified**: The provided raw market pricing data reveals a significant shift in the aluminum and copper markets. Aluminum has transitioned from a contangoed market to one experiencing backwardation, indicating a tightening of spreads across the forward curves.
+
+- **Severe Prompt Spread Moves**:
+  - **Aluminum**:
+    - 3M prompt spread has moved into strong backwardation, with the backwardation extending out to 12 months. This indicates a high demand for immediate delivery compared to later dates.
+  - **Copper**:
+    - The copper market shows signs of emerging contango, with the prompt spread flattening out from 3 to 9 months forward. This suggests a more balanced supply and demand dynamic across different time frames.
+
+- **Absolute Arbitrage Flags**: The data highlights potential arbitrage opportunities in the zinc and lead markets, where discrepancies between spot prices and nearby contracts have widened. This could be attributed to specific market dynamics or temporary disruptions in the supply chain.
+
+- **Physical Momentum Flags**:
+  - **Aluminum**:
+    - There is strong physical momentum in the immediate aluminum market, with a significant rise in forward curve demand. This could be due to increased industrial activity and a shift towards just-in-time inventory management.
+  - **Copper**:
+    - Copper's physical market has shown moderate momentum, with steady demand across all time frames. However, it lacks the sharp spikes seen in aluminum, suggesting a more stable but less dynamic market.
+
+## Recommendations:
+
+- **Aluminum Trading Strategy**: Focus on short-term trading strategies for immediate delivery, taking advantage of the strong backwardation to maximize profits. Monitor physical supply closely for potential arbitrage opportunities against other metals or regions.
   
-- **Copper:** The 3M spread has widened considerably compared to previous weeks, moving further into contango territory. This could signal an oversupply in the longer-dated contracts.
+- **Copper Trading Strategy**: Adopt a more balanced approach, considering both short and medium-term trading opportunities. Keep an eye on emerging contango conditions but remain prepared for sudden changes in market sentiment.
 
-- **Zinc:** A notable shift towards backwardation in both the cash-wire and 1-month spreads, hinting at tightening physical metal availability and potential for spot market volatility.
+- **Zinc and Lead Arbitrage Opportunities**: Investigate the widening price gaps between spot and forward contracts in zinc and lead markets. Conduct thorough due diligence to identify any underlying reasons for these discrepancies, such as supply chain disruptions or regional price differences. Consider carefully timed arbitrage trades to capitalize on these opportunities.
 
-## Severe Prompt Spread Movements
-
-- **Lead:** The 3M spread has expanded significantly into contango, suggesting an excess supply of longer-dated contracts. This could lead to discounting in the prompt months as hedgers look to offload forward positions.
-
-- **Tin:** While overall spreads remain stable, a sharp inward movement in the cash-wire spread indicates a potential shift towards backwardation. Traders should monitor for physical arbitrage opportunities.
-
-## Absolute Arbitrage and Physical Momentum Flags
-
-- **Nickel:** A narrow 3M spread combined with a backwardated cash-wire position creates an ideal scenario for arbitrage players to exploit price discrepancies between physical markets and LME futures.
-
-- **Aluminum:** The rapid narrowing of the cash-wire spread suggests strong demand for immediate delivery, signaling a potential momentum shift towards higher spot prices. Traders should be prepared for active bidding wars in the short term.
-
-## Recommendations
-
-1. **Focus on Aluminum and Nickel:** For those looking to capitalize on arbitrage opportunities, closely monitor the aluminum and nickel markets. The structural shifts observed today present compelling chances for quick profits.
-
-2. **Copper and Zinc Hedgers Alerted:** Those with forward positions in copper and zinc should consider reducing or hedging against potential price declines due to the contango pressures in those markets.
-
-3. **Tightening Markets Watched Closely:** The backwardation trends in zinc, lead, and tin warrant close attention over the coming weeks as these shifts could trigger more significant market movements.
-
-## Conclusion
-
-Today's LME non-ferrous metals trading landscape reveals several critical structural shifts and potential arbitrage opportunities. Market participants should adjust their strategies accordingly, focusing on aluminum, nickel, copper, and zinc markets with a keen eye towards physical metal availability and demand dynamics.
+- **Physical Market Monitoring**: Maintain heightened awareness of physical market dynamics across all non-ferrous metals. Stay informed about industrial activity levels and inventory management practices in key consumer sectors. Be ready to adjust trading strategies based on real-time changes in supply and demand dynamics within the physical markets.
