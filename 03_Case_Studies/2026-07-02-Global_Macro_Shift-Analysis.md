@@ -1,5 +1,7 @@
 tags: ##Geopolitics
 
+tags: ##Geopolitics
+
 # OpenClaw Multi-Source Macro Analysis — 2026-07-02
 
 # Global Macro Shift Analysis Report
